@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080f1a">
-<title>COURTSIDE AI V14 — Sports Broadcast UI</title>
+<title>COURTSIDE AI V22 — Sports Broadcast UI</title>
 <style>
 :root{--bg:#070e17;--panel:#0d1825;--panel2:#111f30;--line:#23354a;--muted:#9aaabd;--text:#f4f7fb;--blue:#0878ff;--blue2:#0e5ce6;--green:#00d28b;--red:#ff3659;--gold:#f6c84e}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 48% -20%,#1b3450 0,#080f1a 54%);color:var(--text);font:14px/1.4 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #61a7ff;outline-offset:2px}
@@ -92,7 +92,7 @@ a{color:#8fc4ff}
 </head>
 <body>
 <header class="top">
- <div class="brand">COURTSIDE AI <span class="version">V9</span><small>SPORTS ANALYSIS PLATFORM</small></div>
+ <div class="brand">COURTSIDE AI <span class="version">V22</span><small>SPORTS ANALYSIS PLATFORM</small></div>
  <div class="sporttabs"><button class="sport active" data-sport="basketball">🏀 농구</button><button class="sport" data-sport="soccer">⚽ 축구</button><button class="sport" data-sport="baseball">⚾ 야구</button></div>
  <div class="topright"><button class="control" id="featured">♛ 주요 경기만</button><input class="control" type="date" id="date" aria-label="조회 날짜"><button class="control livepill" id="live">◉ 실시간</button><button class="control iconbtn" id="refresh" title="새로고침">⟳</button></div>
 </header>
@@ -151,8 +151,35 @@ function dayLabel(day){let d=new Date(day+'T12:00:00+09:00');return new Intl.Dat
 function renderDays(){const d=$('date').value||ymd(new Date());$('daybar').innerHTML=Array.from({length:7},(_,i)=>{let x=shift(d,i-2);return `<button class="daybtn ${x===d?'active':''}" data-day="${x}">${i===2?'선택일 ':''}${dayLabel(x)}</button>`}).join('');$('daybar').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('date').value=b.dataset.day;renderDays();loadGames()})}
 function renderLeagues(){let html='';for(const [key,list] of Object.entries(LEAGUES)){html+=`<div class="group"><div class="groupname">${key==='basketball'?'🏀 농구 리그':key==='soccer'?'⚽ 축구 리그':'⚾ 야구 리그'}</div>${list.map(l=>`<button class="leaguebtn ${l.id===league.id?'active':''}" data-id="${l.id}"><span class="em">${l.emoji}</span><span>${l.label}</span>${l.id===league.id?'<span class="check">✓</span>':''}</button>`).join('')}</div>`}$('leagueGroups').innerHTML=html;$('leagueGroups').querySelectorAll('button').forEach(b=>b.onclick=()=>{for(const arr of Object.values(LEAGUES)){const f=arr.find(x=>x.id===b.dataset.id);if(f){league=f;sport=Object.keys(LEAGUES).find(k=>LEAGUES[k]===arr);break}}document.querySelectorAll('.sport').forEach(x=>x.classList.toggle('active',x.dataset.sport===sport));renderLeagues();loadGames()})}
 function normalizeEvent(ev){const comp=ev.competitions?.[0];if(!comp)return null;const competitors=comp.competitors||[];const h=competitors.find(c=>c.homeAway==='home')||competitors[0],a=competitors.find(c=>c.homeAway==='away')||competitors[1];if(!h||!a)return null;const status=ev.status?.type||{};const state=status.state||'pre';const home=h.team?.displayName||h.team?.name||'Home';const away=a.team?.displayName||a.team?.name||'Away';return {id:ev.id||`${home}-${away}-${ev.date}`,home,away,homeTeamId:h.team?.id||'',awayTeamId:a.team?.id||'',homeLogo:h.team?.logo||h.team?.logos?.[0]?.href||'',awayLogo:a.team?.logo||a.team?.logos?.[0]?.href||'',date:ev.date||new Date().toISOString(),status:state==='in'?'실시간':state==='post'?'종료':'예정',state,live:state==='in',done:state==='post',hasScore:h.score!=null&&a.score!=null,hs:Number(h.score),as:Number(a.score),league:league.label,path:league.path,emoji:league.emoji,venue:comp.venue?.fullName||'',broadcast:comp.broadcasts?.[0]?.names?.join(', ')||'',raw:ev}}
-async function loadGames(){matches=[];selected=null;$('matches').innerHTML='<div class="empty">실제 경기 일정을 불러오는 중…</div>';$('scheduleState').textContent=`${league.label} · ${$('date').value} · 데이터 조회 중`;$('count').textContent='조회 중';renderDays();if(!league.path){$('matches').innerHTML=`<div class="empty"><b>${league.label} 일정 피드가 현재 연결되어 있지 않습니다.</b><br>이 리그의 실제 경기 목록을 지어내서 표시하지 않았습니다.<br><br><a href="${league.id==='kbo'?'https://eng.koreabaseball.com/Schedule/DailySchedule.aspx':'https://npb.jp/games/'}" target="_blank" rel="noopener" style="color:#77b6ff">공식 일정 열기 ↗</a></div>`;$('scheduleState').textContent='공식 일정 링크 제공 · 자동 피드 미연결';$('count').textContent='외부 피드 미연결';return}
-const day=$('date').value||ymd(new Date());const key=league.path+'|KST|'+day;try{let data=cache.get(key);if(!data){const queryDays=[shift(day,-1),day,shift(day,1)];const payloads=await Promise.all(queryDays.map(async qd=>{const url=`https://site.api.espn.com/apis/site/v2/sports/${league.path}/scoreboard?dates=${qd.replaceAll('-','')}&limit=100`;const res=await fetch(url);if(!res.ok)throw Error('일정 제공처 응답 오류');return await res.json()}));const unique=new Map();payloads.forEach(j=>(j.events||[]).forEach(ev=>unique.set(ev.id||`${ev.date}-${ev.name}`,ev)));data={events:[...unique.values()]};cache.set(key,data)}matches=(data.events||[]).map(normalizeEvent).filter(Boolean).filter(m=>ymd(new Date(m.date))===day);applyFilter();$('scheduleState').textContent=`${league.label} · ${dayLabel(day)} · 실제 공개 피드 · 한국시간 기준`;if(!matches.length)$('matches').innerHTML=`<div class="empty">선택한 날짜에 표시할 경기가 없습니다.<br>다른 날짜를 선택하거나 예정 경기 날짜를 확인해 주세요.</div>`}catch(e){$('matches').innerHTML=`<div class="empty">일정 조회에 실패했습니다.<br>${esc(e.message)}<br><br>브라우저에서 외부 데이터 제공처 접속이 차단될 수도 있습니다.</div>`;$('scheduleState').textContent='일정 피드 조회 실패'}$('count').textContent=`${matches.length}경기`}
+async function loadGames(){
+matches=[];selected=null;$('matches').innerHTML='<div class="empty">실제 경기 일정을 불러오는 중…</div>';$('scheduleState').textContent=`${league.label} · ${$('date').value} · 데이터 조회 중`;$('count').textContent='조회 중';renderDays();
+if(!league.path){$('matches').innerHTML=`<div class="empty"><b>${league.label} 자동 일정 피드가 연결되어 있지 않습니다.</b><br>공식 일정에서 실제 경기를 확인해 주세요.<br><br><a href="${league.id==='kbo'?'https://eng.koreabaseball.com/Schedule/DailySchedule.aspx':'https://npb.jp/games/'}" target="_blank" rel="noopener" style="color:#77b6ff">공식 일정 열기 ↗</a></div>`;$('scheduleState').textContent='공식 일정 링크 제공 · 자동 피드 미연결';$('count').textContent='외부 피드 미연결';return}
+const day=$('date').value||ymd(new Date());const key=league.path+'|KST|'+day;
+try{
+ let data=cache.get(key);
+ if(!data){
+  const queryDays=[shift(day,-1),day,shift(day,1)];
+  const payloads=await Promise.all(queryDays.map(async qd=>{
+   const urls=[
+    `https://site.api.espn.com/apis/site/v2/sports/${league.path}/scoreboard?dates=${qd.replaceAll('-','')}&limit=100`,
+    `https://site.web.api.espn.com/apis/site/v2/sports/${league.path}/scoreboard?dates=${qd.replaceAll('-','')}&limit=100`,
+    ...(sport==='soccer'?[`https://cdn.espn.com/core/soccer/scoreboard?xhr=1&league=${league.path.replace(/^soccer\//,'')}&date=${qd.replaceAll('-','')}`]:[])
+   ];
+   for(const url of urls){try{const res=await fetch(url,{cache:'no-store'});if(!res.ok)continue;const j=await res.json();let events=j.events||j.content?.events||j.events?.items||[];if(!events.length&&j.content&&Array.isArray(j.content.events))events=j.content.events;if(events.length)return {events,source:url.includes('cdn.espn.com')?'ESPN CDN':'ESPN Site API'};}catch(e){}}
+   return {events:[],source:'피드 응답 없음'};
+  }));
+  const unique=new Map();payloads.forEach(j=>(j.events||[]).forEach(ev=>unique.set(ev.id||`${ev.date}-${ev.name}`,ev)));
+  data={events:[...unique.values()],source:payloads.find(x=>x.events.length)?.source||'피드 응답 없음'};cache.set(key,data)
+ }
+ matches=(data.events||[]).map(normalizeEvent).filter(Boolean).filter(m=>ymd(new Date(m.date))===day);
+ applyFilter();$('scheduleState').textContent=`${league.label} · ${dayLabel(day)} · ${data.source||'실제 공개 피드'} · 한국시간 기준`;
+ if(!matches.length){
+  const official=league.id==='kleague'?'https://www.kleague.com/schedule.do':league.id==='jleague'?'https://www.jleague.jp/match/':'';
+  $('matches').innerHTML=`<div class="empty"><b>${esc(league.label)} 경기 데이터를 자동 피드에서 찾지 못했습니다.</b><br>이 날짜에 경기가 없거나 ESPN 피드가 해당 리그를 제공하지 않을 수 있습니다.${official?`<br><br><a href="${official}" target="_blank" rel="noopener" style="color:#77b6ff">${esc(league.label)} 공식 일정 열기 ↗</a>`:''}<br><br>날짜를 바꿔 다시 조회해 주세요. 확인되지 않은 경기를 임의로 만들지는 않았습니다.</div>`;
+ }
+}catch(e){$('matches').innerHTML=`<div class="empty">일정 조회에 실패했습니다.<br>${esc(e.message)}<br><br>공개 데이터 제공처가 해당 리그를 지원하지 않거나 브라우저 연결이 차단되었을 수 있습니다.</div>`;$('scheduleState').textContent='일정 피드 조회 실패'}
+$('count').textContent=`${matches.length}경기`
+}
 function applyFilter(){let arr=matches.filter(m=>filter==='all'||filter==='live'&&m.live||filter==='upcoming'&&m.state==='pre'||filter==='done'&&m.done);if(featured)arr=arr.slice(0,24);$('matches').innerHTML=arr.length?arr.map((m,i)=>`<div class="match ${selected?.id===m.id?'selected':''} ${m.done?'completed-match':''}"><div class="time">${m.done?'<span class="status-completed">종료됨</span>':m.live?'<span class="status-live">LIVE</span>':fmtTime(m.date).split(' ')[2]||fmtTime(m.date).slice(-5)}</div><div class="pair"><div class="pairtext"><div class="teamline"><span class="teamname"><img class="teamlogo" src="${esc(m.homeLogo||'')}" alt="" onerror="this.style.display='none'"><b>${esc(names(m.home)[0])}</b></span><span class="versus">${m.done?`${m.hs} : ${m.as}`:'vs'}</span><span class="teamname"><img class="teamlogo" src="${esc(m.awayLogo||'')}" alt="" onerror="this.style.display='none'"><b>${esc(names(m.away)[0])}</b></span></div><small><span class="status ${m.live?'live':m.done?'done':''}">${m.done?'경기 종료':m.status}</span> · ${esc(m.league)} · ${esc(fmtTime(m.date))}${m.venue?' · '+esc(m.venue):''}</small></div></div><button class="miniBtn" data-select="${m.id}">분석 보기</button></div>`).join(''):$('matches').innerHTML='<div class="empty">선택한 조건에 맞는 경기가 없습니다.</div>';$('matches').querySelectorAll('[data-select]').forEach(b=>b.onclick=()=>chooseMatch(matches.find(m=>m.id===b.dataset.select)))}
 function addForm(id,rows,team){$(id).innerHTML=rows.length?rows.slice(0,5).map(m=>{let isHome=m.home===team,forS=isHome?m.hs:m.as,against=isHome?m.as:m.hs;return `<span class="formchip ${forS<against?'l':''}">${forS>against?'W':forS<against?'L':'D'}</span>`}).join(''):'<span class="minor">기록 없음</span>'}
 async function recentGames(team){const key=league.path+'|form|'+team;if(cache.has(key))return cache.get(key);let days=Array.from({length:45},(_,i)=>shift($('date').value||ymd(new Date()),-i-1));let events=[];await Promise.all(days.map(async d=>{try{const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/${league.path}/scoreboard?dates=${d.replaceAll('-','')}&limit=100`);if(!r.ok)return;const j=await r.json();for(const ev of j.events||[]){let m=normalizeEvent(ev);if(m&&m.done&&m.hasScore&&(m.home===team||m.away===team))events.push(m)}}catch(e){}}));events.sort((a,b)=>new Date(b.date)-new Date(a.date));let result=[...new Map(events.map(m=>[m.id,m])).values()].slice(0,5);cache.set(key,result);return result}
@@ -168,20 +195,21 @@ async function injuriesFor(m){
   if(m.homeTeamId)requests.push({scope:m.home,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.homeTeamId}/injuries`});
   if(m.awayTeamId)requests.push({scope:m.away,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.awayTeamId}/injuries`});
   requests.push({scope:'',url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/injuries`});
-  const responses=await Promise.all(requests.map(async q=>{try{const r=await fetch(q.url,{cache:'no-store'});if(!r.ok)return {scope:q.scope,ok:false};return {scope:q.scope,ok:true,data:await r.json()}}catch(e){return {scope:q.scope,ok:false}}}));
+  requests.push({scope:'',url:`https://site.web.api.espn.com/apis/site/v2/sports/${m.path}/injuries`});
+  const responses=await Promise.all(requests.map(async q=>{try{const r=await fetch(q.url,{cache:'no-store'});if(!r.ok)return {scope:q.scope,ok:false,url:q.url,status:r.status};const data=await r.json();return {scope:q.scope,ok:true,data,url:q.url,status:r.status}}catch(e){return {scope:q.scope,ok:false,url:q.url,error:String(e)}}}));
   let arr=[];const seen=new Set();
   function walk(x,sourceTeam='',inheritedTeam=''){
    if(!x||typeof x!=='object')return;
    if(Array.isArray(x)){x.forEach(v=>walk(v,sourceTeam,inheritedTeam));return}
    let localTeam='';
-   if(x.team){localTeam=typeof x.team==='string'?x.team:(x.team.displayName||x.team.name||x.team.shortDisplayName||'')}
+   if(x.team){localTeam=typeof x.team==='string'?x.team:(x.team.displayName||x.team.name||x.team.shortDisplayName||x.team.abbreviation||'')}else if(x.teamName)localTeam=String(x.teamName);else if(x.displayName&&/injur|report/i.test(String(x.type?.text||x.type?.name||'')))localTeam=String(x.displayName)
    const groupTeam=sourceTeam||localTeam||inheritedTeam;
-   const athlete=x.athlete||x.player;
+   const athlete=x.athlete||x.player||x.participant?.athlete;
    if(athlete&&(x.status||x.type||x.details||x.injuryStatus||x.injury||x.location||x.date)){
     const name=athlete.displayName||athlete.fullName||athlete.name||athlete.shortName||'선수명 미제공';
     const statusObj=x.status;
-    const status=(statusObj&&typeof statusObj==='object'?(statusObj.type?.description||statusObj.name||statusObj.description||statusObj.abbreviation):statusObj)||x.injuryStatus?.displayName||x.injuryStatus?.name||x.fantasy?.status||x.type?.description||'상태 미제공';
-    const detail=x.details?.detail||x.details?.type||x.detail||x.location||x.type?.description||x.injury?.description||x.injury?.type?.description||'';
+    const status=(statusObj&&typeof statusObj==='object'?(statusObj.type?.description||statusObj.name||statusObj.description||statusObj.abbreviation):statusObj)||x.injuryStatus?.displayName||x.injuryStatus?.name||x.fantasy?.status||x.type?.description||x.type?.name||x.injury?.type?.name||'상태 미제공';
+    const detail=x.details?.detail||x.details?.type||x.detail||x.location||x.injury?.description||x.injury?.type?.description||x.injury?.type?.name||x.notes||'';
     const key=name+'|'+groupTeam+'|'+status;
     if(!seen.has(key)){seen.add(key);arr.push({name,team:groupTeam,status:String(status),detail:String(detail||''),sourceTeam})}
    }
