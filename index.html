@@ -117,7 +117,7 @@ a{color:#8fc4ff}
   <section class="panel"><div class="panelhead"><h2>AI 분석 요약</h2><span class="minor">근거 기반</span></div><ul class="summarylist" id="summary"><li><span class="dot">●</span>경기를 선택하면 양 팀 최근 흐름과 데이터 상태를 요약합니다.</li></ul></section>
  </aside>
 </div>
-<footer class="foot">COURTSIDE AI V16 · ESPN 공개 피드 기반 · 부상자 데이터는 리그별 제공 여부가 다릅니다 · 예측은 참고 정보이며 결과를 보장하지 않습니다.</footer>
+<footer class="foot">COURTSIDE AI V20 · ESPN 공개 피드 기반 · 부상자 데이터는 리그별 제공 여부가 다릅니다 · 예측은 참고 정보이며 결과를 보장하지 않습니다.</footer>
 <script>
 const LEAGUES={
  basketball:[{id:'nba',label:'NBA',en:'NBA',emoji:'🏀',path:'basketball/nba',important:true},{id:'euro',label:'유로리그',en:'EuroLeague',emoji:'🏀',path:'basketball/euro-league',important:true},{id:'kbl',label:'KBL',en:'Korean Basketball League',emoji:'🏀',path:'basketball/korea-basketball-league',important:true}],
@@ -164,10 +164,9 @@ async function injuriesFor(m){
  if(!m.path){$('injuries').innerHTML='<div class="empty">이 리그의 자동 부상자 피드가 연결되지 않았습니다. 결장자가 없다는 뜻은 아닙니다.</div>';return}
  try{
   const requests=[];
-  if(sport==='soccer'){
-   if(m.homeTeamId)requests.push({scope:m.home,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.homeTeamId}/injuries`});
-   if(m.awayTeamId)requests.push({scope:m.away,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.awayTeamId}/injuries`});
-  }
+  // Query team-specific injury feeds for every supported sport, then use league feed as fallback.
+  if(m.homeTeamId)requests.push({scope:m.home,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.homeTeamId}/injuries`});
+  if(m.awayTeamId)requests.push({scope:m.away,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.awayTeamId}/injuries`});
   requests.push({scope:'',url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/injuries`});
   const responses=await Promise.all(requests.map(async q=>{try{const r=await fetch(q.url,{cache:'no-store'});if(!r.ok)return {scope:q.scope,ok:false};return {scope:q.scope,ok:true,data:await r.json()}}catch(e){return {scope:q.scope,ok:false}}}));
   let arr=[];const seen=new Set();
