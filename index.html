@@ -18,7 +18,7 @@
 <div class="tabs" id="tabs"><button class="tab active" data-sport="NBA">🏀 NBA</button><button class="tab" data-sport="축구">⚽ 축구</button><button class="tab" data-sport="MLB">⚾ MLB</button><button class="tab" data-sport="NHL">🏒 NHL</button></div>
 <div class="grid">
 <main>
-<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2 style="margin:0">오늘의 분석 대상</h2><span class="sub">예시 데이터 · 실시간 아님</span></div><div id="matches"></div></section>
+<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">오늘의 경기</h2><button class="btn secondary" onclick="loadLiveMatches()">실제 경기 불러오기</button></div><p class="sub" id="liveStatus" style="margin:10px 0">실제 경기 데이터 연결 준비됨 · 버튼을 눌러 불러오기</p><div id="matches"></div></section>
 <section class="panel" id="analysis"><div class="eyebrow">AI MATCH REPORT</div><h2 id="analysisTitle" style="font-size:21px;margin:7px 0 4px">레이커스 vs 골든스테이트</h2><p class="sub" id="analysisSub">NBA · 예시 분석 리포트</p><div class="scorebox"><div class="metric"><span>홈팀 예상 승률</span><b id="winA">58%</b><div class="meter"><div id="barA" style="width:58%"></div></div></div><div class="metric"><span>원정팀 예상 승률</span><b id="winB">42%</b><div class="meter"><div id="barB" style="width:42%"></div></div></div><div class="metric"><span>예상 점수</span><b id="score">116 : 111</b><span>참고용 추정치</span></div><div class="metric"><span>예상 합산 득점</span><b id="total">227</b><span>실제 기준점 입력 필요</span></div></div><h2>분석 근거</h2><ul class="analysis-text" id="reasons"><li>최근 경기력과 공격·수비 지표를 함께 확인해야 합니다.</li><li>주요 선수 출전 여부와 휴식일이 예측에 큰 영향을 줄 수 있습니다.</li><li>예측 수치는 실제 경기 데이터를 연결하기 전의 데모 값입니다.</li></ul><div class="lock"><strong>🔒 프리미엄 인사이트</strong><p class="sub">세부 매치업 · 시나리오별 예상 · 기록 기반 리포트</p><button class="btn" onclick="document.querySelector('#membership').scrollIntoView({behavior:'smooth'})">프리미엄 확인하기</button></div></section>
 </main>
 <aside>
@@ -29,7 +29,7 @@
 </div>
 <section class="panel" id="membership"><div class="eyebrow">MEMBERSHIP</div><h2 style="font-size:23px;margin:7px 0">더 깊이 있는 분석, 프리미엄으로</h2><p class="muted">회원제 화면 시안 · 결제는 아직 연결되지 않았습니다.</p><div class="plans"><div class="plan"><span class="pill">FREE</span><div class="price">₩0 <span class="sub">/ 월</span></div><ul><li>기본 경기 분석</li><li>일부 예측 리포트</li><li>공개 분석 기록</li></ul><button class="btn secondary full" onclick="toast('무료 플랜은 데모에서 바로 이용할 수 있어요')">무료로 이용하기</button></div><div class="plan featured"><span class="pill" style="color:var(--gold);border-color:#6b5832">PREMIUM</span><div class="price">₩9,900 <span class="sub">/ 월 예시</span></div><ul><li>상세 경기 리포트</li><li>승률·득점 시나리오</li><li>과거 예측 성과 확인</li><li>회원 전용 분석 자료</li></ul><button class="btn full" onclick="toast('실제 결제 기능은 사업자·결제 시스템 연결 후 활성화됩니다')">프리미엄 시작하기</button></div></div><div class="notice">표시된 요금은 예시입니다. 실제 구독 결제, 회원가입, 권한 관리는 서버 및 결제사 연동 후에만 작동합니다.</div></section>
 <section class="panel"><h2>✉️ 업데이트 알림 신청 시안</h2><p class="sub">실제 전송은 연결 전이며, 입력 내용은 이 브라우저에 저장하거나 서버로 보내지 않습니다.</p><div class="formrow"><input id="email" type="email" placeholder="이메일 주소" autocomplete="email"><button class="btn" onclick="toast('알림 신청은 아직 준비 중이에요')">신청</button></div></section>
-<footer class="footer">COURTSIDE AI · SPORTS ANALYTICS DEMO<br>스포츠 분석 정보는 참고용이며 경기 결과와 수익을 보장하지 않습니다.</footer>
+<footer class="footer">COURTSIDE AI · SPORTS ANALYTICS<br><a href="https://sportscore.com/" rel="dofollow" style="color:#f2c66d">Powered by SportScore</a><br>경기 데이터는 제공처의 응답에 따라 달라질 수 있으며 결과를 보장하지 않습니다.</footer>
 </div>
 <div id="toast" class="toast hidden"></div>
 <script>
@@ -40,7 +40,41 @@ const dataset={
  NHL:[{a:"에드먼턴",b:"플로리다",ia:"🏒",ib:"🐆",sa:3,sb:2,p:52,detail:"NHL · 예시 분석 리포트",r:["골리 선발과 세이브율, 특수팀 지표를 함께 확인해야 합니다."]}]
 };
 let currentSport="NBA", current=null;
-function renderMatches(){const list=dataset[currentSport];document.getElementById("matches").innerHTML=list.map((m,i)=>`<div class="match"><div class="teams"><div class="logo">${m.ia}</div><div><div class="teamname">${m.a}</div><div class="sub">vs ${m.b}</div></div></div><span class="status">분석 데모</span><button class="btn secondary" onclick="selectMatch(${i})">분석 보기</button></div>`).join("");selectMatch(0)}
+function renderMatches(){const list=dataset[currentSport];document.getElementById("matches").innerHTML=list.map((m,i)=>`<div class="match"><div class="teams"><div class="logo">${m.ia}</div><div><div class="teamname">${m.a}</div><div class="sub">vs ${m.b}</div></div></div><span class="status">샘플</span><button class="btn secondary" onclick="selectMatch(${i})">분석 보기</button></div>`).join("");selectMatch(0)}
+function val(o, keys, fallback=""){for(const k of keys){if(o && o[k]!==undefined && o[k]!==null && o[k]!=="") return o[k]}return fallback}
+function niceStatus(m){return val(m,["status","statusText","status_text","matchStatus"],"일정/상태 미제공")}
+async function loadLiveMatches(){
+ const sportMap={"NBA":"basketball","축구":"football"};
+ const status=document.getElementById("liveStatus");
+ const box=document.getElementById("matches");
+ if(!sportMap[currentSport]){status.textContent=currentSport+" 실시간 데이터는 현재 연결한 무료 제공처에서 지원하지 않아요. NBA 또는 축구를 선택해 주세요.";return;}
+ const sport=sportMap[currentSport];
+ status.textContent="실제 경기 데이터를 불러오는 중...";
+ try{
+  const url=`https://sportscore.com/api/widget/matches/?sport=${encodeURIComponent(sport)}&limit=20&src=courtside-ai`;
+  const res=await fetch(url,{cache:"no-store"});
+  if(!res.ok) throw new Error("데이터 제공처 응답 오류 ("+res.status+")");
+  const data=await res.json();
+  const arr=Array.isArray(data)?data:(data.matches||data.data||data.fixtures||data.events||[]);
+  if(!Array.isArray(arr)||arr.length===0) throw new Error("현재 가져올 수 있는 경기가 없거나 응답 형식이 달라요");
+  box.innerHTML=arr.slice(0,20).map((m,i)=>{
+   const home=val(m,["homeTeam","home_team","home","teamHome","team_home"],{});
+   const away=val(m,["awayTeam","away_team","away","teamAway","team_away"],{});
+   const homeName=typeof home==="string"?home:val(home,["name","shortName","teamName","displayName"],val(m,["homeTeamName","home_team_name"],"홈팀"));
+   const awayName=typeof away==="string"?away:val(away,["name","shortName","teamName","displayName"],val(m,["awayTeamName","away_team_name"],"원정팀"));
+   const hs=val(m,["homeScore","home_score","scoreHome","home_points"],val(home,["score","points"],"—"));
+   const as=val(m,["awayScore","away_score","scoreAway","away_points"],val(away,["score","points"],"—"));
+   const league=val(m,["competitionName","competition_name","leagueName","league","tournament"],"경기 데이터");
+   const state=niceStatus(m);
+   const when=val(m,["startTime","start_time","date","datetime","kickoff"],"");
+   return `<div class="match"><div class="teams"><div class="logo">🏟️</div><div><div class="teamname">${String(homeName)} <span style="color:var(--gold)">${hs}</span> : <span style="color:var(--gold)">${as}</span> ${String(awayName)}</div><div class="sub">${String(league)} · ${String(state)}${when?" · "+String(when):""}</div></div></div><span class="status">실제 데이터</span></div>`;
+  }).join("");
+  status.textContent="외부 데이터 제공처 응답을 표시 중 · 마지막 갱신 "+new Date().toLocaleTimeString("ko-KR");
+ }catch(e){
+  status.textContent="실제 데이터를 불러오지 못했어요: "+e.message+" · 샘플 경기를 표시합니다.";
+  renderMatches();
+ }
+}
 function selectMatch(i){const m=dataset[currentSport][i];current=m;document.getElementById("analysisTitle").textContent=m.a+" vs "+m.b;document.getElementById("analysisSub").textContent=m.detail+" · 샘플";document.getElementById("winA").textContent=m.p+"%";document.getElementById("winB").textContent=(100-m.p)+"%";document.getElementById("barA").style.width=m.p+"%";document.getElementById("barB").style.width=(100-m.p)+"%";document.getElementById("score").textContent=m.sa+" : "+m.sb;document.getElementById("total").textContent=m.sa+m.sb;document.getElementById("reasons").innerHTML=m.r.map(x=>"<li>"+x+"</li>").join("");calcLine()}
 function calcLine(){if(!current)return;let line=parseFloat(document.getElementById("line").value);if(!Number.isFinite(line)){toast("기준점을 숫자로 입력해 주세요");return}let diff=current.sa+current.sb-line;document.getElementById("lineResult").textContent=diff>0?`기준점보다 ${diff.toFixed(1)}점 높음`:diff<0?`기준점보다 ${Math.abs(diff).toFixed(1)}점 낮음`:"기준점과 같음";document.getElementById("lineExplain").textContent="샘플 예상 득점과 입력 기준점의 단순 비교이며 실제 확률 예측은 아닙니다."}
 function toast(t){let el=document.getElementById("toast");el.textContent=t;el.classList.remove("hidden");clearTimeout(window.tt);window.tt=setTimeout(()=>el.classList.add("hidden"),2800)}
