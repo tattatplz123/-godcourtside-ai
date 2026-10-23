@@ -18,12 +18,12 @@
 <div class="tabs" id="tabs"><button class="tab active" data-sport="NBA">🏀 NBA</button><button class="tab" data-sport="축구">⚽ 축구</button><button class="tab" data-sport="MLB">⚾ MLB</button><button class="tab" data-sport="NHL">🏒 NHL</button></div>
 <div class="grid">
 <main>
-<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">오늘의 경기</h2><button class="btn secondary" onclick="loadLiveMatches()">실제 경기 불러오기</button></div><p class="sub" id="liveStatus" style="margin:10px 0">실제 경기 데이터 연결 준비됨 · 버튼을 눌러 불러오기</p><div id="matches"></div></section>
-<section class="panel" id="analysis"><div class="eyebrow">AI MATCH REPORT</div><h2 id="analysisTitle" style="font-size:21px;margin:7px 0 4px">레이커스 vs 골든스테이트</h2><p class="sub" id="analysisSub">NBA · 예시 분석 리포트</p><div class="scorebox"><div class="metric"><span>홈팀 예상 승률</span><b id="winA">58%</b><div class="meter"><div id="barA" style="width:58%"></div></div></div><div class="metric"><span>원정팀 예상 승률</span><b id="winB">42%</b><div class="meter"><div id="barB" style="width:42%"></div></div></div><div class="metric"><span>예상 점수</span><b id="score">116 : 111</b><span>참고용 추정치</span></div><div class="metric"><span>예상 합산 득점</span><b id="total">227</b><span>실제 기준점 입력 필요</span></div></div><h2>분석 근거</h2><ul class="analysis-text" id="reasons"><li>최근 경기력과 공격·수비 지표를 함께 확인해야 합니다.</li><li>주요 선수 출전 여부와 휴식일이 예측에 큰 영향을 줄 수 있습니다.</li><li>예측 수치는 실제 경기 데이터를 연결하기 전의 데모 값입니다.</li></ul><div class="lock"><strong>🔒 프리미엄 인사이트</strong><p class="sub">세부 매치업 · 시나리오별 예상 · 기록 기반 리포트</p><button class="btn" onclick="document.querySelector('#membership').scrollIntoView({behavior:'smooth'})">프리미엄 확인하기</button></div></section>
+<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">오늘의 경기</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn secondary" onclick="loadUpcomingMatches(7)">예정 경기 7일</button><button class="btn secondary" onclick="loadLiveMatches()">실시간·최근 경기</button></div></div><p class="sub" id="liveStatus" style="margin:10px 0">예정 경기와 실제 점수를 불러올 수 있어요 · 종목별 제공 범위는 다릅니다</p><div id="matches"></div><p class="notice" id="scheduleNote">경기 일정은 데이터 제공처 기준이며, 시간은 한국 시간으로 표시합니다.</p></section>
+<section class="panel" id="analysis"><div class="eyebrow">AI MATCH REPORT</div><h2 id="analysisTitle" style="font-size:21px;margin:7px 0 4px">레이커스 vs 골든스테이트</h2><p class="sub" id="analysisSub">NBA · 예시 분석 리포트</p><div class="scorebox"><div class="metric"><span>홈팀 승률 / 참고치</span><b id="winA">58%</b><div class="meter"><div id="barA" style="width:58%"></div></div></div><div class="metric"><span>원정팀 승률 / 참고치</span><b id="winB">42%</b><div class="meter"><div id="barB" style="width:42%"></div></div></div><div class="metric"><span>점수 / 예상 점수</span><b id="score">116 : 111</b><span>참고용 추정치</span></div><div class="metric"><span>합산 득점</span><b id="total">227</b><span>실제 실제 점수 또는 모델 필요</span></div></div><h2>분석 근거</h2><ul class="analysis-text" id="reasons"><li>최근 경기력과 공격·수비 지표를 함께 확인해야 합니다.</li><li>주요 선수 출전 여부와 휴식일이 예측에 큰 영향을 줄 수 있습니다.</li><li>예측 수치는 실제 경기 데이터를 연결하기 전의 데모 값입니다.</li></ul><div class="lock"><strong>🔒 프리미엄 인사이트</strong><p class="sub">세부 매치업 · 시나리오별 예상 · 기록 기반 리포트</p><button class="btn" onclick="document.querySelector('#membership').scrollIntoView({behavior:'smooth'})">프리미엄 확인하기</button></div></section>
 </main>
 <aside>
-<section class="panel"><h2>📊 분석 센터</h2><div class="row"><span class="muted">지원 종목</span><b>4개 종목 데모</b></div><div class="row" style="margin-top:12px"><span class="muted">분석 엔진</span><b>모델 연결 전</b></div><div class="row" style="margin-top:12px"><span class="muted">데이터 상태</span><b style="color:var(--gold)">샘플 데이터</b></div><p class="notice">현재 화면은 디자인과 기본 상호작용을 확인하는 데모입니다. 실제 경기 일정·점수·AI 분석은 데이터 API와 서버 연결 후 제공됩니다.</p></section>
-<section class="panel"><h2>🧠 분석 도구</h2><label class="sub" for="line">언더·오버 기준점 입력</label><div class="formrow" style="margin:8px 0 12px"><input id="line" type="number" value="224.5" step="0.5" inputmode="decimal"><button class="btn" onclick="calcLine()">비교</button></div><div class="metric"><span>예상 합산 득점과 비교</span><b id="lineResult">기준점보다 2.5점 높음</b><span id="lineExplain">데모 예상치 기준이며 추천이나 보장 정보가 아닙니다.</span></div></section>
+<section class="panel"><h2>📊 분석 센터</h2><div class="row"><span class="muted">실제 일정·점수</span><b>축구·농구</b></div><div class="row" style="margin-top:12px"><span class="muted">팀 이름</span><b>한국어 표기 우선</b></div><div class="row" style="margin-top:12px"><span class="muted">분석 방식</span><b>데이터 기반 참고 분석</b></div><p class="notice">실제 승률 모델, 선수 부상·선발 명단, 배당률 분석은 별도 통계 데이터와 서버형 분석 모델이 있어야 정확하게 제공할 수 있습니다. 이 사이트는 확인 가능한 정보와 단순 참고 추정을 구분해 표시합니다.</p></section>
+<section class="panel"><h2>🧠 분석 도구</h2><label class="sub" for="line">언더·오버 기준점 입력</label><div class="formrow" style="margin:8px 0 12px"><input id="line" type="number" value="224.5" step="0.5" inputmode="decimal"><button class="btn" onclick="calcLine()">비교</button></div><div class="metric"><span>합산 득점과 비교</span><b id="lineResult">경기 선택 후 계산</b><span id="lineExplain">예정 경기 예상 점수 모델은 아직 연결되지 않았습니다.</span></div></section>
 <section class="panel"><h2>📌 분석 이용 원칙</h2><p class="analysis-text">확률은 보장된 결과가 아닙니다. 선수 부상, 라인업, 일정과 데이터 품질에 따라 결과가 달라집니다. 실제 데이터가 연결되기 전에는 샘플 수치를 실제 예측으로 오해하지 마세요.</p></section>
 </aside>
 </div>
@@ -33,52 +33,128 @@
 </div>
 <div id="toast" class="toast hidden"></div>
 <script>
-const dataset={
- NBA:[{a:"LA 레이커스",b:"골든스테이트",ia:"🟣",ib:"🌉",sa:116,sb:111,p:58,detail:"NBA · 예시 분석 리포트",r:["공격 효율과 턴오버 비율을 함께 비교해야 합니다.","백투백 일정과 주전 선수 출전 여부가 승률 추정에 영향을 줍니다.","예시 수치는 실시간 기록이나 실제 AI 예측이 아닙니다."]},{a:"보스턴",b:"밀워키",ia:"☘️",ib:"🦌",sa:113,sb:109,p:55,detail:"NBA · 예시 분석 리포트",r:["외곽슛 성공률과 리바운드 차이를 점검하세요.","최근 5경기만으로 장기적인 전력을 단정하지 않는 것이 좋습니다."]}],
- "축구":[{a:"맨체스터 시티",b:"리버풀",ia:"🔵",ib:"🔴",sa:2,sb:1,p:54,detail:"축구 · 예시 분석 리포트",r:["점유율보다 유효슈팅과 찬스 질을 함께 봐야 합니다.","선발 명단과 일정, 홈·원정 성적을 확인해야 합니다."]},{a:"레알 마드리드",b:"바르셀로나",ia:"⚪",ib:"🔴",sa:2,sb:2,p:51,detail:"축구 · 예시 분석 리포트",r:["세트피스와 전환 공격이 경기 흐름에 영향을 줄 수 있습니다."]}],
- MLB:[{a:"LA 다저스",b:"뉴욕 양키스",ia:"⚾",ib:"🗽",sa:5,sb:4,p:53,detail:"MLB · 예시 분석 리포트",r:["선발 투수의 최근 이닝과 삼진·볼넷 비율을 확인해야 합니다.","불펜 소모도와 구장 특성이 득점 추정에 영향을 줍니다."]}],
- NHL:[{a:"에드먼턴",b:"플로리다",ia:"🏒",ib:"🐆",sa:3,sb:2,p:52,detail:"NHL · 예시 분석 리포트",r:["골리 선발과 세이브율, 특수팀 지표를 함께 확인해야 합니다."]}]
+
+const sportApiMap={"NBA":"basketball","축구":"football","MLB":null,"NHL":null};
+const teamKo={
+// NBA
+"Atlanta Hawks":"애틀랜타 호크스","Boston Celtics":"보스턴 셀틱스","Brooklyn Nets":"브루클린 네츠","Charlotte Hornets":"샬럿 호네츠","Chicago Bulls":"시카고 불스","Cleveland Cavaliers":"클리블랜드 캐벌리어스","Dallas Mavericks":"댈러스 매버릭스","Denver Nuggets":"덴버 너기츠","Detroit Pistons":"디트로이트 피스턴스","Golden State Warriors":"골든스테이트 워리어스","Houston Rockets":"휴스턴 로키츠","Indiana Pacers":"인디애나 페이서스","LA Clippers":"LA 클리퍼스","Los Angeles Clippers":"LA 클리퍼스","Los Angeles Lakers":"LA 레이커스","LA Lakers":"LA 레이커스","Memphis Grizzlies":"멤피스 그리즐리스","Miami Heat":"마이애미 히트","Milwaukee Bucks":"밀워키 벅스","Minnesota Timberwolves":"미네소타 팀버울브스","New Orleans Pelicans":"뉴올리언스 펠리컨스","New York Knicks":"뉴욕 닉스","Oklahoma City Thunder":"오클라호마시티 썬더","Orlando Magic":"올랜도 매직","Philadelphia 76ers":"필라델피아 세븐티식서스","Phoenix Suns":"피닉스 선즈","Portland Trail Blazers":"포틀랜드 트레일블레이저스","Sacramento Kings":"새크라멘토 킹스","San Antonio Spurs":"샌안토니오 스퍼스","Toronto Raptors":"토론토 랩터스","Utah Jazz":"유타 재즈","Washington Wizards":"워싱턴 위저즈",
+// Football
+"Manchester City":"맨체스터 시티","Manchester United":"맨체스터 유나이티드","Liverpool":"리버풀","Arsenal":"아스널","Chelsea":"첼시","Tottenham Hotspur":"토트넘 홋스퍼","Tottenham":"토트넘 홋스퍼","Newcastle United":"뉴캐슬 유나이티드","Aston Villa":"애스턴 빌라","Real Madrid":"레알 마드리드","Barcelona":"바르셀로나","Atlético Madrid":"아틀레티코 마드리드","Atletico Madrid":"아틀레티코 마드리드","Sevilla":"세비야","Real Sociedad":"레알 소시에다드","Bayern Munich":"바이에른 뮌헨","Borussia Dortmund":"보루시아 도르트문트","Bayer Leverkusen":"바이어 레버쿠젠","RB Leipzig":"RB 라이프치히","Paris Saint-Germain":"파리 생제르맹","PSG":"파리 생제르맹","Marseille":"마르세유","Inter Milan":"인터 밀란","Internazionale":"인터 밀란","AC Milan":"AC 밀란","Juventus":"유벤투스","Napoli":"나폴리","Roma":"AS 로마","Atalanta":"아탈란타","Ajax":"아약스","Benfica":"벤피카","Porto":"포르투","Sporting CP":"스포르팅 CP","Celtic":"셀틱","Rangers":"레인저스","Flamengo":"플라멩구","Boca Juniors":"보카 주니어스","River Plate":"리버 플레이트",
+"Louisville City FC":"루이빌 시티","Hartford Athletic":"하트퍼드 애슬레틱"
 };
-let currentSport="NBA", current=null;
-function renderMatches(){const list=dataset[currentSport];document.getElementById("matches").innerHTML=list.map((m,i)=>`<div class="match"><div class="teams"><div class="logo">${m.ia}</div><div><div class="teamname">${m.a}</div><div class="sub">vs ${m.b}</div></div></div><span class="status">샘플</span><button class="btn secondary" onclick="selectMatch(${i})">분석 보기</button></div>`).join("");selectMatch(0)}
-function val(o, keys, fallback=""){for(const k of keys){if(o && o[k]!==undefined && o[k]!==null && o[k]!=="") return o[k]}return fallback}
-function niceStatus(m){return val(m,["status","statusText","status_text","matchStatus"],"일정/상태 미제공")}
-async function loadLiveMatches(){
- const sportMap={"NBA":"basketball","축구":"football"};
- const status=document.getElementById("liveStatus");
+function koTeam(name){if(!name)return "팀 미정";let s=String(name).trim();if(teamKo[s])return teamKo[s];if(s==="Home"||s==="home")return "홈팀";if(s==="Away"||s==="away")return "원정팀";return s;}
+function val(o, keys, fallback=""){for(const k of keys){if(o && o[k]!==undefined && o[k]!==null && o[k]!=="") return o[k]}return fallback;}
+function apiStatus(s){const v=String(s||"").toLowerCase();if(/live|in.?play|playing|1st|2nd|half|period/.test(v))return "진행 중";if(/finish|ended|full.?time|ft|complete/.test(v))return "종료";if(/postpon|cancel|abandon/.test(v))return "연기·취소";if(/upcoming|scheduled|not.?started|fixture|pending|ns/.test(v))return "경기 예정";return s||"상태 미제공";}
+function dateKo(v){if(!v)return "";const d=new Date(v);if(Number.isNaN(d.getTime()))return String(v);return d.toLocaleString("ko-KR",{timeZone:"Asia/Seoul",month:"numeric",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false});}
+function safeText(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+let currentSport="NBA", current=null, currentMatches=[], requestSeq=0;
+function iconForSport(){return currentSport==="NBA"?"🏀":"⚽";}
+function setStatus(s){document.getElementById("liveStatus").textContent=s;}
+function renderMatchCards(matches, label){
+ currentMatches=matches;
  const box=document.getElementById("matches");
- if(!sportMap[currentSport]){status.textContent=currentSport+" 실시간 데이터는 현재 연결한 무료 제공처에서 지원하지 않아요. NBA 또는 축구를 선택해 주세요.";return;}
- const sport=sportMap[currentSport];
- status.textContent="실제 경기 데이터를 불러오는 중...";
+ if(!matches.length){box.innerHTML='<div class="muted" style="padding:16px 0">이 기간에 표시할 경기를 찾지 못했어요. 다른 종목이나 최근 경기 버튼을 확인해 주세요.</div>';return;}
+ box.innerHTML=matches.map((m,i)=>{
+   const home=koTeam(m.home), away=koTeam(m.away);
+   const score=(m.home_score!==undefined&&m.home_score!==null&&m.home_score!=="")?`<span style="color:var(--gold)">${safeText(m.home_score)} : ${safeText(m.away_score??"—")}</span>`:"";
+   const status=apiStatus(m.status_text||m.status);
+   const when=dateKo(m.time||m.start_time||m.date||m.datetime);
+   const comp=val(m,["competition","competition_name","league","tournament"],currentSport==="NBA"?"농구":"축구");
+   return `<div class="match"><div class="teams"><div class="logo">${iconForSport()}</div><div style="min-width:0"><div class="teamname">${safeText(home)} ${score} ${safeText(away)}</div><div class="sub">${safeText(comp)} · ${safeText(status)}${when?" · "+safeText(when):""}</div></div></div><button class="btn secondary" onclick="selectApiMatch(${i})">분석 보기</button></div>`;
+ }).join("");
+}
+function pickMatches(data){const a=Array.isArray(data)?data:(data?.matches||data?.fixtures||data?.data||data?.events||[]);return Array.isArray(a)?a:[];}
+function localDatePlus(n){const d=new Date();d.setDate(d.getDate()+n);const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${day}`;}
+async function loadUpcomingMatches(days=7){
+ const apiSport=sportApiMap[currentSport], seq=++requestSeq;
+ if(!apiSport){setStatus(`${currentSport}는 현재 연결된 무료 데이터 제공처에서 지원하지 않아요. 농구 또는 축구를 선택해 주세요.`);return;}
+ setStatus(`앞으로 ${days}일간 예정 경기를 불러오는 중...`);
+ document.getElementById("matches").innerHTML='<p class="muted">경기 일정을 불러오고 있어요. 잠시만 기다려 주세요.</p>';
  try{
-  const url=`https://sportscore.com/api/widget/matches/?sport=${encodeURIComponent(sport)}&limit=20&src=courtside-ai`;
-  const res=await fetch(url,{cache:"no-store"});
-  if(!res.ok) throw new Error("데이터 제공처 응답 오류 ("+res.status+")");
-  const data=await res.json();
-  const arr=Array.isArray(data)?data:(data.matches||data.data||data.fixtures||data.events||[]);
-  if(!Array.isArray(arr)||arr.length===0) throw new Error("현재 가져올 수 있는 경기가 없거나 응답 형식이 달라요");
-  box.innerHTML=arr.slice(0,20).map((m,i)=>{
-   const home=val(m,["homeTeam","home_team","home","teamHome","team_home"],{});
-   const away=val(m,["awayTeam","away_team","away","teamAway","team_away"],{});
-   const homeName=typeof home==="string"?home:val(home,["name","shortName","teamName","displayName"],val(m,["homeTeamName","home_team_name"],"홈팀"));
-   const awayName=typeof away==="string"?away:val(away,["name","shortName","teamName","displayName"],val(m,["awayTeamName","away_team_name"],"원정팀"));
-   const hs=val(m,["homeScore","home_score","scoreHome","home_points"],val(home,["score","points"],"—"));
-   const as=val(m,["awayScore","away_score","scoreAway","away_points"],val(away,["score","points"],"—"));
-   const league=val(m,["competitionName","competition_name","leagueName","league","tournament"],"경기 데이터");
-   const state=niceStatus(m);
-   const when=val(m,["startTime","start_time","date","datetime","kickoff"],"");
-   return `<div class="match"><div class="teams"><div class="logo">🏟️</div><div><div class="teamname">${String(homeName)} <span style="color:var(--gold)">${hs}</span> : <span style="color:var(--gold)">${as}</span> ${String(awayName)}</div><div class="sub">${String(league)} · ${String(state)}${when?" · "+String(when):""}</div></div></div><span class="status">실제 데이터</span></div>`;
-  }).join("");
-  status.textContent="외부 데이터 제공처 응답을 표시 중 · 마지막 갱신 "+new Date().toLocaleTimeString("ko-KR");
+   const dates=Array.from({length:days},(_,i)=>localDatePlus(i));
+   const all=[];
+   // API requests are sequential to avoid overloading the free provider.
+   for(const date of dates){
+     const u=`https://sportscore.com/api/v1/fixtures/?sport=${encodeURIComponent(apiSport)}&date=${date}&status=upcoming&limit=100`;
+     const r=await fetch(u,{cache:"no-store"});
+     if(!r.ok)continue;
+     const data=await r.json();
+     all.push(...pickMatches(data));
+   }
+   if(seq!==requestSeq)return;
+   const seen=new Set();
+   const unique=all.filter(m=>{const key=String(m.slug||"")+"|"+String(m.time||m.date||"")+"|"+String(m.home||m.home_team||"")+"|"+String(m.away||m.away_team||"");if(seen.has(key))return false;seen.add(key);return true;});
+   unique.sort((a,b)=>new Date(a.time||a.date||0)-new Date(b.time||b.date||0));
+   const upcoming=unique.filter(m=>!/(finish|ended|complete|cancel|postpon|abandon)/i.test(String(m.status||m.status_text||"")));
+   renderMatchCards(upcoming,"예정");
+   setStatus(`앞으로 ${days}일 일정 · ${upcoming.length}경기 · 마지막 갱신 ${new Date().toLocaleTimeString("ko-KR")}`);
+   document.getElementById("scheduleNote").textContent="팀 이름은 주요 구단을 한국어로 표기합니다. 매핑되지 않은 팀은 제공처 원문으로 표시될 수 있습니다.";
+   if(!upcoming.length)document.getElementById("scheduleNote").textContent="제공처가 이 기간에 예정 경기로 반환한 항목이 없습니다. 최근 경기 버튼도 확인해 주세요.";
  }catch(e){
-  status.textContent="실제 데이터를 불러오지 못했어요: "+e.message+" · 샘플 경기를 표시합니다.";
-  renderMatches();
+   if(seq!==requestSeq)return;
+   setStatus("예정 경기 데이터를 불러오지 못했어요. 네트워크 또는 제공처 상태를 확인해 주세요.");
+   document.getElementById("matches").innerHTML='<p class="muted">일정 연결에 실패했습니다. ‘실시간·최근 경기’를 눌러 다시 확인해 주세요.</p>';
  }
 }
-function selectMatch(i){const m=dataset[currentSport][i];current=m;document.getElementById("analysisTitle").textContent=m.a+" vs "+m.b;document.getElementById("analysisSub").textContent=m.detail+" · 샘플";document.getElementById("winA").textContent=m.p+"%";document.getElementById("winB").textContent=(100-m.p)+"%";document.getElementById("barA").style.width=m.p+"%";document.getElementById("barB").style.width=(100-m.p)+"%";document.getElementById("score").textContent=m.sa+" : "+m.sb;document.getElementById("total").textContent=m.sa+m.sb;document.getElementById("reasons").innerHTML=m.r.map(x=>"<li>"+x+"</li>").join("");calcLine()}
-function calcLine(){if(!current)return;let line=parseFloat(document.getElementById("line").value);if(!Number.isFinite(line)){toast("기준점을 숫자로 입력해 주세요");return}let diff=current.sa+current.sb-line;document.getElementById("lineResult").textContent=diff>0?`기준점보다 ${diff.toFixed(1)}점 높음`:diff<0?`기준점보다 ${Math.abs(diff).toFixed(1)}점 낮음`:"기준점과 같음";document.getElementById("lineExplain").textContent="샘플 예상 득점과 입력 기준점의 단순 비교이며 실제 확률 예측은 아닙니다."}
+async function loadLiveMatches(){
+ const apiSport=sportApiMap[currentSport],seq=++requestSeq;
+ if(!apiSport){setStatus(`${currentSport}는 현재 연결된 무료 데이터 제공처에서 지원하지 않아요. 농구 또는 축구를 선택해 주세요.`);return;}
+ setStatus("실시간·최근 경기 데이터를 불러오는 중...");
+ document.getElementById("matches").innerHTML='<p class="muted">경기 데이터를 불러오고 있어요.</p>';
+ try{
+  const r=await fetch(`https://sportscore.com/api/widget/matches/?sport=${encodeURIComponent(apiSport)}&limit=50&src=courtside-ai`,{cache:"no-store"});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  const data=await r.json();if(seq!==requestSeq)return;
+  const arr=pickMatches(data);
+  renderMatchCards(arr,"최근");
+  setStatus(`실시간·최근 경기 ${arr.length}개 · 마지막 갱신 ${new Date().toLocaleTimeString("ko-KR")}`);
+ }catch(e){if(seq!==requestSeq)return;setStatus("실시간·최근 경기 데이터를 불러오지 못했습니다.");document.getElementById("matches").innerHTML='<p class="muted">데이터 제공처에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.</p>';}
+}
+function selectApiMatch(i){
+ const m=currentMatches[i];if(!m)return;
+ const home=koTeam(m.home||m.home_team||m.homeTeam),away=koTeam(m.away||m.away_team||m.awayTeam);
+ const status=apiStatus(m.status_text||m.status);
+ const rawStatus=String(m.status_text||m.status||"").toLowerCase(); const hasScore=m.home_score!==undefined&&m.home_score!==null&&m.home_score!==""&&!/(upcoming|scheduled|not.?started|fixture|pending|\bns\b)/i.test(rawStatus);
+ const hs=hasScore?Number(m.home_score):null,as=hasScore?Number(m.away_score):null;
+ current={home,away,hs,as,hasScore,status,competition:val(m,["competition","competition_name","league"],currentSport==="NBA"?"농구":"축구"),time:m.time||m.date||""};
+ document.getElementById("analysisTitle").textContent=`${home} vs ${away}`;
+ document.getElementById("analysisSub").textContent=`${current.competition} · ${status}${current.time?" · "+dateKo(current.time):""}`;
+ if(hasScore){
+   document.getElementById("winA").textContent="결과 확인";
+   document.getElementById("winB").textContent="결과 확인";
+   document.getElementById("barA").style.width=(hs>as?"100%":hs===as?"50%":"0%");
+   document.getElementById("barB").style.width=(as>hs?"100%":hs===as?"50%":"0%");
+   document.getElementById("score").textContent=`${hs} : ${as}`;
+   document.getElementById("total").textContent=hs+as;
+   document.getElementById("reasons").innerHTML=`<li>실제 표시 점수: ${safeText(home)} ${hs}점, ${safeText(away)} ${as}점</li><li>경기 상태: ${safeText(status)}. 점수와 상태는 데이터 제공처 응답 기준입니다.</li><li>이 화면은 과거 결과를 바탕으로 승률을 역산하지 않습니다. 경기 전 예측은 별도 통계가 필요합니다.</li>`;
+ }else{
+   // Explicitly labeled simple baseline, not a trained prediction model.
+   const homeP=currentSport==="축구"?52:53, awayP=100-homeP;
+   document.getElementById("winA").textContent=`${homeP}%*`;
+   document.getElementById("winB").textContent=`${awayP}%*`;
+   document.getElementById("barA").style.width=homeP+"%";
+   document.getElementById("barB").style.width=awayP+"%";
+   document.getElementById("score").textContent="계산 불가";
+   document.getElementById("total").textContent="계산 불가";
+   document.getElementById("reasons").innerHTML=`<li>현재 연결된 데이터에는 이 경기의 팀별 최근 성적, 선수 결장, 선발 명단이 충분히 포함되지 않아 정확한 점수 / 예상 점수를 계산할 수 없습니다.</li><li>* ${homeP}% / ${awayP}%는 모델 예측이 아니라 홈 이점만 반영한 참고 기준치입니다. 실제 예측값으로 사용하지 마세요.</li><li>정확한 분석에는 최근 경기 기록, 득실/공격·수비 지표, 결장자, 일정, 그리고 검증된 예측 모델이 필요합니다.</li>`;
+ }
+ calcLine();
+ document.getElementById("analysis").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function selectMatch(i){selectApiMatch(i);}
+function calcLine(){
+ if(!current)return;
+ const line=parseFloat(document.getElementById("line").value);
+ if(!Number.isFinite(line)){toast("기준점을 숫자로 입력해 주세요");return;}
+ if(!current.hasScore){document.getElementById("lineResult").textContent="예상 득점 자료 없음";document.getElementById("lineExplain").textContent="예정 경기의 점수 / 예상 점수 모델이 아직 연결되지 않아 언더·오버를 계산할 수 없습니다.";return;}
+ const total=current.hs+current.as,diff=total-line;
+ document.getElementById("lineResult").textContent=diff>0?`현재 합산 점수가 기준점보다 ${diff.toFixed(1)}점 높음`:diff<0?`현재 합산 점수가 기준점보다 ${Math.abs(diff).toFixed(1)}점 낮음`:"현재 합산 점수와 기준점이 같음";
+ document.getElementById("lineExplain").textContent="실제 현재 점수와 기준점의 단순 비교입니다. 경기 종료 전에는 최종 언더·오버 결과가 아닙니다.";
+}
 function toast(t){let el=document.getElementById("toast");el.textContent=t;el.classList.remove("hidden");clearTimeout(window.tt);window.tt=setTimeout(()=>el.classList.add("hidden"),2800)}
-document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentSport=b.dataset.sport;renderMatches()}));
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");currentSport=b.dataset.sport;current=null;document.getElementById("matches").innerHTML="";setStatus("종목을 선택했어요. 경기 일정을 불러와 주세요.");if(sportApiMap[currentSport])loadUpcomingMatches(7);else setStatus(`${currentSport} 실제 데이터는 현재 제공처에서 지원하지 않아요. UI 탭만 제공됩니다.`);}));
 renderMatches();
+function renderMatches(){document.getElementById("matches").innerHTML='<p class="muted">위의 ‘예정 경기 7일’을 눌러 실제 일정을 불러와 주세요.</p>';current=null;}
+
 </script>
 </body></html>
