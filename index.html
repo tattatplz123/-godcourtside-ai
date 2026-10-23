@@ -191,49 +191,56 @@ async function injuriesFor(m){
  if(!m.path){$('injuries').innerHTML='<div class="empty">이 리그의 자동 부상자 피드가 연결되지 않았습니다. 결장자가 없다는 뜻은 아닙니다.</div>';return}
  try{
   const requests=[];
-  // Query team-specific injury feeds for every supported sport, then use league feed as fallback.
   if(m.homeTeamId)requests.push({scope:m.home,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.homeTeamId}/injuries`});
   if(m.awayTeamId)requests.push({scope:m.away,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.awayTeamId}/injuries`});
   requests.push({scope:'',url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/injuries`});
   requests.push({scope:'',url:`https://site.web.api.espn.com/apis/site/v2/sports/${m.path}/injuries`});
-  const responses=await Promise.all(requests.map(async q=>{try{const r=await fetch(q.url,{cache:'no-store'});if(!r.ok)return {scope:q.scope,ok:false,url:q.url,status:r.status};const data=await r.json();return {scope:q.scope,ok:true,data,url:q.url,status:r.status}}catch(e){return {scope:q.scope,ok:false,url:q.url,error:String(e)}}}));
-  let arr=[];const seen=new Set();
-  function walk(x,sourceTeam='',inheritedTeam=''){
+  const responses=await Promise.all(requests.map(async q=>{try{const r=await fetch(q.url,{cache:'no-store'});if(!r.ok)return {scope:q.scope,ok:false,url:q.url,status:r.status};return {scope:q.scope,ok:true,data:await r.json(),url:q.url,status:r.status}}catch(e){return {scope:q.scope,ok:false,url:q.url,error:String(e)}}}));
+  const arr=[],seen=new Set();
+  const textVal=v=>typeof v==='string'||typeof v==='number'?String(v):'';
+  function addPlayer(athlete,injury,team,scope){
+   if(!athlete||typeof athlete!=='object')return;
+   const name=athlete.displayName||athlete.fullName||athlete.name||athlete.shortName||athlete.athlete?.displayName||'';
+   if(!name)return;
+   const statusObj=injury?.status||injury?.injuryStatus||injury?.availability||athlete.status;
+   const status=(typeof statusObj==='object'?(statusObj.type?.description||statusObj.type?.name||statusObj.name||statusObj.description||statusObj.abbreviation):textVal(statusObj))||injury?.type?.description||injury?.type?.name||injury?.statusText||'상태 미제공';
+   const detail=injury?.details?.detail||injury?.details?.type||injury?.detail||injury?.description||injury?.location||injury?.type?.description||injury?.type?.name||injury?.injury?.description||injury?.notes||'';
+   const teamName=typeof team==='string'?team:(team?.displayName||team?.name||team?.shortDisplayName||team?.abbreviation||'');
+   const key=[name,teamName||scope,status,detail].join('|').toLowerCase();
+   if(!seen.has(key)){seen.add(key);arr.push({name,team:teamName,sourceTeam:scope,status:String(status),detail:String(detail||'')})}
+  }
+  function walk(x,scope='',inheritedTeam=''){
    if(!x||typeof x!=='object')return;
-   if(Array.isArray(x)){x.forEach(v=>walk(v,sourceTeam,inheritedTeam));return}
-   let localTeam='';
-   if(x.team){localTeam=typeof x.team==='string'?x.team:(x.team.displayName||x.team.name||x.team.shortDisplayName||x.team.abbreviation||'')}else if(x.teamName)localTeam=String(x.teamName);else if(x.displayName&&/injur|report/i.test(String(x.type?.text||x.type?.name||'')))localTeam=String(x.displayName)
-   const groupTeam=sourceTeam||localTeam||inheritedTeam;
+   if(Array.isArray(x)){x.forEach(v=>walk(v,scope,inheritedTeam));return}
+   const team=x.team||x.teamName||inheritedTeam||'';
    const athlete=x.athlete||x.player||x.participant?.athlete;
-   if(athlete&&(x.status||x.type||x.details||x.injuryStatus||x.injury||x.location||x.date)){
-    const name=athlete.displayName||athlete.fullName||athlete.name||athlete.shortName||'선수명 미제공';
-    const statusObj=x.status;
-    const status=(statusObj&&typeof statusObj==='object'?(statusObj.type?.description||statusObj.name||statusObj.description||statusObj.abbreviation):statusObj)||x.injuryStatus?.displayName||x.injuryStatus?.name||x.fantasy?.status||x.type?.description||x.type?.name||x.injury?.type?.name||'상태 미제공';
-    const detail=x.details?.detail||x.details?.type||x.detail||x.location||x.injury?.description||x.injury?.type?.description||x.injury?.type?.name||x.notes||'';
-    const key=name+'|'+groupTeam+'|'+status;
-    if(!seen.has(key)){seen.add(key);arr.push({name,team:groupTeam,status:String(status),detail:String(detail||''),sourceTeam})}
+   // ESPN can store a player's injuries as a separate array, rather than fields beside athlete.
+   if(athlete&&Array.isArray(x.injuries)){
+    if(x.injuries.length)x.injuries.forEach(inj=>addPlayer(athlete,inj,team,scope));
+    else if(x.status||x.injuryStatus||x.availability)addPlayer(athlete,x,team,scope);
    }
-   Object.values(x).forEach(v=>{if(v&&typeof v==='object')walk(v,sourceTeam,groupTeam)});
+   if(athlete&&(x.status||x.type||x.details||x.injuryStatus||x.injury||x.location||x.date||x.availability))addPlayer(athlete,x,team,scope);
+   // Some ESPN feeds wrap each player in {athlete, injury:{...}} or list rows under items/entries.
+   if(x.athlete&&typeof x.athlete==='object'&&x.injury&&typeof x.injury==='object')addPlayer(x.athlete,x.injury,team,scope);
+   Object.entries(x).forEach(([k,v])=>{if(v&&typeof v==='object')walk(v,scope,team)})
   }
   responses.filter(r=>r.ok).forEach(r=>walk(r.data,r.scope,''));
-  const norm=v=>String(v||'').toLocaleLowerCase().replace(/[^a-z0-9가-힣]/g,'');
-  const homeKeys=[m.home,names(m.home)[0],names(m.home)[1]].map(norm);
-  const awayKeys=[m.away,names(m.away)[0],names(m.away)[1]].map(norm);
+  const norm=v=>String(v||'').toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9가-힣]/g,'');
+  const homeKeys=[m.home,names(m.home)[0],names(m.home)[1]].map(norm).filter(Boolean);
+  const awayKeys=[m.away,names(m.away)[0],names(m.away)[1]].map(norm).filter(Boolean);
   const teamRows=(team,keys)=>arr.filter(x=>{
-   if(x.sourceTeam===team)return true;
+   if(x.sourceTeam&&x.sourceTeam===team)return true;
    if(!x.team)return false;
-   const t=norm(x.team);
-   return keys.some(k=>k===t||k.includes(t)||t.includes(k));
+   const t=norm(x.team);return keys.some(k=>k===t||k.includes(t)||t.includes(k));
   });
   const homeRows=teamRows(m.home,homeKeys),awayRows=teamRows(m.away,awayKeys);
-  const homeHasScoped=responses.some(r=>r.ok&&r.scope===m.home),awayHasScoped=responses.some(r=>r.ok&&r.scope===m.away);
   if(!homeRows.length&&!awayRows.length){
-   const failed=responses.every(r=>!r.ok);
-   $('injuries').innerHTML=`<div class="empty"><b>${failed?'부상자 데이터 제공처에 연결하지 못했습니다.':'공개 피드에서 양 팀의 부상자 항목을 찾지 못했습니다.'}</b><br>${failed?'요청 실패 또는 해당 리그 피드 미지원입니다.':'데이터가 없다는 뜻이며, 부상자가 없거나 전원이 출전 가능하다는 뜻은 아닙니다.'}<br><br><span class="minor">${responses.filter(r=>r.ok).length}개 피드 응답 성공 · 팀별 조회 ${homeHasScoped?'홈팀 성공':'홈팀 미확인'} / ${awayHasScoped?'원정팀 성공':'원정팀 미확인'}</span></div>`;
-   $('injuryStamp').textContent=failed?'피드 연결 실패':'피드에 항목 없음';return;
+   const okCount=responses.filter(r=>r.ok).length,failed=okCount===0;
+   $('injuries').innerHTML=`<div class="empty"><b>${failed?'부상자 데이터 제공처에 연결하지 못했습니다.':'피드 응답은 받았지만 선수별 부상 항목을 확인하지 못했습니다.'}</b><br>${failed?'해당 리그 피드 미지원 또는 연결 오류입니다.':'응답에 부상자 목록이 없거나 ESPN이 해당 리그 부상자 정보를 공개하지 않을 수 있습니다.'}<br><br><span class="minor">${okCount}/${responses.length}개 피드 응답 성공 · 선수 데이터 ${arr.length}건 파싱 · 팀별 항목 ${homeRows.length}/${awayRows.length}</span><br><span class="minor">부상자 정보 미제공은 부상자가 없다는 뜻이 아닙니다.</span></div>`;
+   $('injuryStamp').textContent=failed?'피드 연결 실패':'선수 항목 확인 안 됨';return;
   }
   const table=(team,rows)=>`<div class="teaminj"><h3>${esc(names(team)[0])}<span class="playereng">${esc(names(team)[1])}</span></h3><div class="inner">${rows.length?`<table class="injurytable"><thead><tr><th>선수 / Player</th><th>상태</th><th>부상 부위 / 세부 정보</th></tr></thead><tbody>${rows.map(x=>{const st=injuryStatusText(x.status);return `<tr><td><b>${esc(x.name)}</b><span class="playereng">${esc(x.name)}</span></td><td class="${st[1]}">${esc(st[0])}</td><td>${esc(x.detail||'세부 정보 미제공')}</td></tr>`}).join('')}</tbody></table>`:'<div class="empty">확인된 항목 없음<br><span class="minor">정보 미제공일 수 있어 부상자가 없다고 단정할 수 없습니다.</span></div>'}</div></div>`;
-  $('injuries').innerHTML=`<div class="injurycols">${table(m.home,homeRows)}${table(m.away,awayRows)}</div><div class="minor" style="padding:10px 2px">출전 상태·부상 부위·복귀 예정일은 제공처에 명시된 경우에만 표시합니다. 선수 이름은 원문 표기를 유지하며 팀명은 가능한 경우 한국어로 번역합니다.</div>`;
+  $('injuries').innerHTML=`<div class="injurycols">${table(m.home,homeRows)}${table(m.away,awayRows)}</div><div class="minor" style="padding:10px 2px">선수 이름은 실제 피드 원문을 사용합니다. 상태와 부상 부위는 제공처가 반환한 경우에만 표시됩니다.</div>`;
   $('injuryStamp').textContent='공개 피드 조회 완료';
  }catch(e){$('injuries').innerHTML=`<div class="empty">부상자 데이터 연결 실패 (${esc(e.message)}).<br>부상자가 없다는 뜻은 아닙니다.</div>`;$('injuryStamp').textContent='조회 실패'}
 }
