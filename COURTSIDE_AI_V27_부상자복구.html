@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080f1a">
+<title>COURTSIDE AI V26 — Sports Broadcast UI</title>
+<style>
+:root{--bg:#070e17;--panel:#0d1825;--panel2:#111f30;--line:#23354a;--muted:#9aaabd;--text:#f4f7fb;--blue:#0878ff;--blue2:#0e5ce6;--green:#00d28b;--red:#ff3659;--gold:#f6c84e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 48% -20%,#1b3450 0,#080f1a 54%);color:var(--text);font:14px/1.4 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #61a7ff;outline-offset:2px}
+.top{height:74px;display:flex;align-items:center;gap:28px;padding:0 24px;border-bottom:1px solid #243246;background:#070d16e8;position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}
+.brand{min-width:245px;font-size:23px;font-weight:950;letter-spacing:-.8px}.brand small{display:block;font-size:10px;color:#8798ad;letter-spacing:1.6px;font-weight:700}.version{font-size:11px;background:#174fe5;border-radius:5px;padding:4px 8px;vertical-align:middle;margin-left:5px}
+.sporttabs{display:flex;gap:10px;align-items:center}.sport{border:1px solid #26394f;background:#101a28;border-radius:12px;padding:12px 24px;font-weight:850;font-size:15px;min-width:130px}.sport.active{background:linear-gradient(135deg,#116aff,#0648d9);border-color:#2584ff;box-shadow:0 0 24px #075dfc55}
+.topright{margin-left:auto;display:flex;align-items:center;gap:10px}.control{border:1px solid #2a3c53;background:#101a28;border-radius:11px;padding:10px 12px;color:#e7edf6}.iconbtn{width:42px;height:42px;font-size:18px}.livepill{color:#ff526c;border-color:#813044}.layout{display:grid;grid-template-columns:232px minmax(360px,1.05fr) minmax(420px,1fr);gap:12px;max-width:1900px;margin:auto;padding:12px}
+.sidebar,.panel{background:linear-gradient(145deg,#0e1a28,#0a131f);border:1px solid #1e3045;border-radius:15px;min-width:0}.sidebar{padding:14px 12px;height:calc(100vh - 100px);position:sticky;top:86px;overflow:auto}.sidehead{font-size:12px;color:#92a4ba;font-weight:900;letter-spacing:1px;padding:8px 8px 10px}.group{padding:8px 0 12px;border-bottom:1px solid #1d2b3d;margin-bottom:10px}.groupname{font-weight:900;padding:6px 8px 8px}.leaguebtn{display:flex;align-items:center;width:100%;gap:9px;text-align:left;background:transparent;border:1px solid transparent;border-radius:9px;padding:9px 8px;color:#bdc9d8}.leaguebtn:hover{background:#152438}.leaguebtn.active{background:#102f55;border-color:#155fc0;color:#fff}.leaguebtn .em{width:24px;text-align:center;font-size:17px}.check{margin-left:auto;color:#63a8ff;font-size:13px}.sidebottom{color:#8d9db2;padding:12px 8px;font-size:12px;line-height:2}
+.center,.right{min-width:0}.daybar{display:flex;gap:6px;overflow:auto;padding:2px 0 10px}.daybtn{white-space:nowrap;border:1px solid #24374d;background:#101a28;border-radius:9px;padding:10px 13px;color:#b9c6d7}.daybtn.active{border-color:#147aff;color:white;background:#102b4e;box-shadow:0 0 14px #0878ff22}.panel{padding:14px;margin-bottom:12px}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.panelhead h2{font-size:17px;margin:0}.minor{font-size:11px;color:#91a2b7}.filterrow{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.filter{border:1px solid #2a3b50;background:#142234;border-radius:9px;padding:8px 12px;color:#b9c6d5}.filter.active{background:#064bd8;border-color:#147aff;color:white}.toggle{display:flex;align-items:center;gap:8px;color:#c4d0df;font-size:12px;margin-left:auto}
+.matches{border-top:1px solid #1d2d41}.match{display:grid;grid-template-columns:55px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid #1a293b}.match.selected{background:linear-gradient(90deg,#102c4b,#101e2e);outline:1px solid #276ab3;border-radius:10px}.time{font-size:13px;font-weight:900;color:#eaf1fb}.pair{display:flex;align-items:center;gap:9px;min-width:0}.teamicon{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#203249;font-size:17px;flex-shrink:0}.pairtext{min-width:0}.pairtext b{display:block;font-size:13px;white-space:normal}.pairtext small{display:block;color:#8fa2b8;font-size:11px;margin-top:3px}.status{display:inline-block;font-size:10px;color:#b8c7da;border:1px solid #32465d;border-radius:5px;padding:2px 5px;margin-right:4px}.status.live{color:#ff5d75;border-color:#93334a}.status.done{color:#8ca0b7}.miniBtn{border:1px solid #0878ff;background:#0d2b4c;border-radius:8px;padding:8px 10px;font-weight:800;font-size:11px;white-space:nowrap}.empty{color:#9baabd;padding:26px 10px;text-align:center;line-height:1.7}.detailhero{padding:14px;background:radial-gradient(ellipse at center,#202139,#0d1826 68%);border:1px solid #293448;border-radius:13px}.matchmeta{font-size:11px;color:#9cacc0}.versus{display:grid;grid-template-columns:1fr 48px 1fr;align-items:center;text-align:center;gap:5px;padding:20px 0 12px}.bigicon{font-size:48px;filter:drop-shadow(0 6px 10px #0007)}.teamlabel{font-size:15px;font-weight:900;margin-top:5px}.teameng{font-size:10px;color:#91a1b6;margin-top:3px;overflow-wrap:anywhere}.vs{font-size:21px;font-weight:950;color:#8597b2;font-style:italic}.formchips{display:flex;justify-content:center;gap:4px;margin-top:9px}.formchip{font-size:10px;border-radius:50%;width:20px;height:20px;display:grid;place-items:center;background:#087e61}.formchip.l{background:#ad2c48}.detailtabs{display:flex;gap:6px;overflow:auto;margin:12px 0}.detailtab{white-space:nowrap;border:1px solid #26384d;background:#111e2d;border-radius:8px;padding:9px 11px;font-size:12px;color:#b8c5d6}.detailtab.active{background:#074bd9;color:white;border-color:#0d7bff}.statsgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.statcard{border:1px solid #23354a;background:#0a1522;border-radius:10px;padding:12px;min-width:0}.statcard span{font-size:11px;color:#9aacc1}.statcard b{display:block;font-size:25px;margin:5px 0;overflow-wrap:anywhere}.green{color:var(--green)}.gold{color:var(--gold)}.blue{color:#72b0ff}.compare{margin-top:12px;border:1px solid #20334a;border-radius:10px;padding:12px}.compare h3{font-size:13px;margin:0 0 10px}.barrow{display:grid;grid-template-columns:45px minmax(25px,1fr) 100px minmax(25px,1fr) 45px;align-items:center;gap:7px;margin:10px 0;font-size:11px}.bar{height:9px;border-radius:20px;background:#23344a;overflow:hidden}.bar i{height:100%;display:block;border-radius:20px;background:linear-gradient(90deg,#00b985,#00e7a0)}.bar.away i{margin-left:auto;background:linear-gradient(90deg,#0878ff,#44a5ff)}.barlabel{text-align:center;color:#a8b6c9}.injurytable{width:100%;border-collapse:collapse;font-size:11px}.injurytable th{text-align:left;color:#8fa2b9;background:#152337;padding:9px 7px;font-weight:700}.injurytable td{padding:9px 7px;border-bottom:1px solid #1d2c3f;vertical-align:top}.injurytable tr:last-child td{border-bottom:0}.playereng{display:block;color:#8fa2b9;font-size:10px;margin-top:3px}.tagred{color:#ff637a}.tagyellow{color:#f4c84f}.taggreen{color:#53e3ae}.injurycols{display:grid;grid-template-columns:1fr 1fr;gap:8px}.teaminj{border:1px solid #203249;border-radius:10px;overflow:hidden;min-width:0}.teaminj h3{font-size:12px;padding:10px;margin:0;background:#111f30}.teaminj .inner{padding:0 8px}.summarylist{list-style:none;margin:0;padding:0}.summarylist li{padding:9px 0;border-bottom:1px solid #1b2b3e;color:#c8d4e3;font-size:12px;display:flex;gap:8px}.summarylist li:last-child{border:0}.dot{color:var(--green);font-size:15px}.foot{font-size:10px;color:#788aa2;text-align:center;padding:15px}
+@media(max-width:1250px){.layout{grid-template-columns:205px minmax(320px,1fr)}.right{grid-column:2}.sidebar{grid-row:1/3}.top{gap:14px}.brand{min-width:180px}.sport{min-width:auto;padding:10px 16px}}
+@media(max-width:800px){.top{height:auto;position:relative;flex-wrap:wrap;padding:12px;gap:10px}.brand{min-width:0;flex:1;font-size:19px}.topright{margin-left:0;width:100%;justify-content:space-between}.sporttabs{width:100%}.sport{flex:1;padding:10px 5px}.layout{display:flex;flex-direction:column;padding:9px}.sidebar{position:static;height:auto;order:0}.sidebar .groups{display:flex;gap:8px;overflow:auto}.group{min-width:190px}.sidebottom{display:none}.center{order:1}.right{order:2}.match{grid-template-columns:45px minmax(0,1fr) auto;gap:6px}.pair{gap:6px}.teamicon{width:25px;height:25px;font-size:14px}.pairtext b{font-size:12px}.miniBtn{padding:7px;font-size:10px}.panel{padding:11px}.statsgrid{grid-template-columns:1fr 1fr}.statsgrid .statcard:last-child{grid-column:1/-1}.injurycols{grid-template-columns:1fr}.barrow{grid-template-columns:34px minmax(20px,1fr) 78px minmax(20px,1fr) 34px;gap:4px}.versus{grid-template-columns:1fr 30px 1fr}.bigicon{font-size:38px}}
+
+/* V14 visual refresh: broadcast-sports feel, brighter contrast, stronger type scale */
+:root{
+ --bg:#08111e;--panel:#101d2e;--panel2:#162840;--line:#2b405b;--muted:#b8c7d9;
+ --text:#f7faff;--blue:#2387ff;--blue2:#1767e8;--green:#31e6a0;--red:#ff536f;--gold:#ffd166;
+}
+body{background:linear-gradient(145deg,#0b1728 0%,#08111e 48%,#0a1525 100%);font-size:15px;line-height:1.55;color:#f7faff}
+.top{height:82px;background:rgba(7,15,27,.94);border-bottom:1px solid #2b405b;box-shadow:0 8px 30px #0003}
+.brand{font-size:25px;letter-spacing:-.5px}.brand small{font-size:11px;color:#b5c8df;letter-spacing:1px;margin-top:2px}
+.version{font-size:12px;padding:4px 8px;background:#1767e8;color:#fff;border-radius:6px}
+button,input,select{font-size:14px}
+button{font-weight:750}
+.panel,.card,.match,.analysis-card,.compare,.sidebox{border-color:#2b405b}
+.panel{background:linear-gradient(180deg,#13243a,#0f1b2b);box-shadow:0 10px 28px #0002}
+h1,h2,h3{color:#f8fbff;letter-spacing:-.2px}
+h1{font-size:25px!important}h2{font-size:20px!important}h3{font-size:16px!important}
+p,.minor,.muted,.subtle,.caption{color:#c1cfe0}
+.minor{font-size:13px;line-height:1.55}
+.match{background:linear-gradient(120deg,#142840,#101d2e);border:1px solid #304a68;border-radius:13px;padding:16px;box-shadow:0 5px 16px #0002;transition:transform .16s,border-color .16s}
+.match:hover{transform:translateY(-2px);border-color:#4d91ef}
+.match .team,.match .team-name,.team-name{font-size:15px;font-weight:800;color:#f8fbff}
+.match .score,.score{font-size:24px;font-weight:950;letter-spacing:.4px;color:#fff}
+.match .time,.time{font-size:13px;font-weight:800;color:#d9e8fa}
+.match .league,.league-label{font-size:11px;font-weight:850;letter-spacing:.6px;text-transform:uppercase;color:#9fc8ff}
+.badge,.status,.match-status{font-size:12px;font-weight:900;letter-spacing:.1px}
+input,select{background:#0b1727!important;color:#f4f8ff!important;border:1px solid #3b526f!important;border-radius:9px!important;min-height:40px}
+button{border-radius:9px}
+button:hover{filter:brightness(1.12)}
+nav button,.tabs button{min-height:42px}
+a{color:#8fc4ff}
+@media(max-width:800px){body{font-size:14px}.top{height:auto;min-height:72px;padding:12px 15px}.brand{font-size:22px}.match{padding:13px}.match .score,.score{font-size:21px}}
+/* Keep completed fixtures visibly distinct */
+.status-completed,.is-completed,.ended-badge{display:inline-flex;align-items:center;gap:5px;background:#26374b;color:#e4edf7;border:1px solid #526780;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:950;letter-spacing:.3px}
+
+
+/* Completed game score placement and state badges */
+.completed-match{border-left:4px solid #8295ad;background:linear-gradient(105deg,#17283c,#111e2e)}
+.completed-match .versus{display:inline-block;color:#fff;background:#263c56;border:1px solid #527092;border-radius:6px;padding:1px 8px;font-size:16px;font-weight:950;white-space:nowrap}
+.status-live{display:inline-block;background:#d7264f;color:white;border-radius:5px;padding:3px 7px;font-size:11px;font-weight:950;letter-spacing:.5px;animation:none}
+.completed-match .pairtext small{color:#d1deee}
+.match .time{min-width:70px}
+.status-completed{white-space:nowrap}
+
+
+/* V15 team-logo layout: compact, readable, broadcast-style */
+.match{display:grid;grid-template-columns:78px minmax(0,1fr) auto;align-items:center;gap:12px;padding:15px 16px}
+.match .time{min-width:0;white-space:nowrap}
+.match .pair{min-width:0;display:block}
+.pairtext{min-width:0;width:100%}
+.teamline{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-width:0;flex-wrap:nowrap}
+.teamname{display:inline-flex;align-items:center;gap:7px;min-width:0;max-width:43%;font-size:14px;font-weight:850;color:#f7faff}
+.teamname b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;line-height:1.35}
+.teamlogo{width:27px;height:27px;object-fit:contain;flex:0 0 27px;filter:drop-shadow(0 2px 4px #0004)}
+.match .versus{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:30px;padding:2px 7px;font-size:12px;font-weight:950;color:#9fb6d1;font-style:italic;background:#0b1727;border:1px solid #2c4360;border-radius:6px;white-space:nowrap}
+.match .pairtext small{display:block;margin-top:7px;font-size:11px;line-height:1.45;color:#bac9da}
+.detailhero .bigicon{width:62px;height:62px;margin:0 auto;display:grid;place-items:center;filter:none}
+.detail-logo{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 5px 10px #0006)}
+.logo-fallback{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#243b56;color:#d8e8fa;font-size:12px;font-weight:900}
+@media(max-width:700px){
+ .match{grid-template-columns:70px minmax(0,1fr);gap:8px;padding:13px 10px}
+ .match .miniBtn{grid-column:2;justify-self:start;padding:6px 9px}
+ .teamline{gap:5px}
+ .teamname{gap:4px;max-width:43%}
+ .teamname b{font-size:12px}
+ .teamlogo{width:23px;height:23px;flex-basis:23px}
+ .match .versus{min-width:25px;padding:2px 5px;font-size:11px}
+}
+
+
+/* V16 injury panel readability */
+#injuryStamp{font-size:12px;font-weight:800;color:#a8cfff}.injurytable{font-size:12px}.injurytable th{font-size:11px;color:#c6d8ee}.injurytable td{line-height:1.45}.teaminj h3{font-size:14px;color:#f4f8ff}.teaminj .empty{font-size:12px;padding:16px 8px}
+
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="brand">COURTSIDE AI <span class="version">V27</span><small>SPORTS ANALYSIS PLATFORM</small></div>
+ <div class="sporttabs"><button class="sport active" data-sport="basketball">🏀 농구</button><button class="sport" data-sport="soccer">⚽ 축구</button><button class="sport" data-sport="baseball">⚾ 야구</button></div>
+ <div class="topright"><button class="control" id="featured">♛ 주요 경기만</button><input class="control" type="date" id="date" aria-label="조회 날짜"><button class="control livepill" id="live">◉ 실시간</button><button class="control iconbtn" id="refresh" title="새로고침">⟳</button></div>
+</header>
+<div class="layout">
+ <aside class="sidebar"><div class="sidehead">리그 선택</div><div class="groups" id="leagueGroups"></div><div class="sidebottom">☆ 즐겨찾기<br>▥ 분석 가이드<br>⚙ 데이터 설정<br><br><span>실제 데이터가 확인되지 않으면 임의의 경기·부상자·확률을 만들지 않습니다.</span></div></aside>
+ <main class="center">
+  <div class="daybar" id="daybar"></div>
+  <section class="panel"><div class="panelhead"><h2>♛ 오늘의 주요 경기</h2><span class="minor" id="count">불러오는 중</span></div>
+   <div class="filterrow"><button class="filter active" data-filter="all">전체</button><button class="filter" data-filter="live">실시간</button><button class="filter" data-filter="upcoming">예정 경기</button><button class="filter" data-filter="done">종료 경기</button><label class="toggle"><input id="importantOnly" type="checkbox" checked> 주요 경기만</label></div>
+   <div class="panelhead"><span class="minor" id="scheduleState">선택한 날짜와 리그의 실제 일정 조회</span><button class="miniBtn" id="loadBtn">경기 불러오기</button></div>
+   <div class="matches" id="matches"><div class="empty">리그와 날짜를 선택한 뒤 경기 불러오기를 눌러줘.</div></div>
+   <div class="minor" style="padding-top:10px">모든 경기 시간은 한국 시간으로 표시합니다. 경기 수가 0이면 해당 날짜 일정이 없거나 데이터 피드가 지원하지 않을 수 있습니다.</div>
+  </section>
+  <section class="panel"><div class="panelhead"><h2>🩹 팀별 부상자 / 출전 상태</h2><span class="minor" id="injuryStamp">경기 선택 후 조회</span></div><div id="injuries"><div class="empty">경기 목록에서 분석 보기를 눌러 양 팀 부상자 정보를 조회하세요.</div></div></section>
+ </main>
+ <aside class="right">
+  <section class="panel"><div class="panelhead"><h2>선택 경기 분석</h2><span class="minor" id="analysisStatus">분석 대기</span></div>
+   <div class="detailhero"><div class="matchmeta" id="matchMeta">리그 · 경기 날짜 · 경기 상태</div><div class="versus"><div><div class="bigicon" id="homeIcon">🏀</div><div class="teamlabel" id="homeKo">홈팀</div><div class="teameng" id="homeEn">Home team</div><div class="formchips" id="homeForm"></div></div><div class="vs">VS</div><div><div class="bigicon" id="awayIcon">🏀</div><div class="teamlabel" id="awayKo">원정팀</div><div class="teameng" id="awayEn">Away team</div><div class="formchips" id="awayForm"></div></div></div></div>
+   <div class="detailtabs"><button class="detailtab active" data-detail="overview">종합 분석</button><button class="detailtab" data-detail="form">최근 경기</button><button class="detailtab" data-detail="injury">부상자 정보</button><button class="detailtab" data-detail="total">언더 / 오버</button></div>
+   <div id="detailContent"><div class="empty">경기를 선택하면 실제 데이터에 기반한 분석을 표시합니다.</div></div>
+  </section>
+  <section class="panel"><div class="panelhead"><h2>AI 분석 요약</h2><span class="minor">근거 기반</span></div><ul class="summarylist" id="summary"><li><span class="dot">●</span>경기를 선택하면 양 팀 최근 흐름과 데이터 상태를 요약합니다.</li></ul></section>
+ </aside>
+</div>
+<footer class="foot">COURTSIDE AI V27 · ESPN 공개 피드 기반 · 부상자 데이터는 리그별 제공 여부가 다릅니다 · 예측은 참고 정보이며 결과를 보장하지 않습니다.</footer>
+<script>
+const LEAGUES={
+ basketball:[{id:'nba',label:'NBA',en:'NBA',emoji:'🏀',path:'basketball/nba',important:true},{id:'euro',label:'유로리그',en:'EuroLeague',emoji:'🏀',path:'basketball/euro-league',important:true},{id:'kbl',label:'KBL',en:'Korean Basketball League',emoji:'🏀',path:'basketball/korea-basketball-league',important:true}],
+ soccer:[{id:'epl',label:'프리미어리그',en:'Premier League',emoji:'⚽',path:'soccer/eng.1',important:true},{id:'laliga',label:'라리가',en:'La Liga',emoji:'⚽',path:'soccer/esp.1',important:true},{id:'bundesliga',label:'분데스리가',en:'Bundesliga',emoji:'⚽',path:'soccer/ger.1',important:true},{id:'seriea',label:'세리에 A',en:'Serie A',emoji:'⚽',path:'soccer/ita.1',important:true},{id:'ligue1',label:'프랑스 리그앙',en:'Ligue 1',emoji:'⚽',path:'soccer/fra.1',important:true},{id:'primeira',label:'포르투갈 프리메이라리가',en:'Primeira Liga',emoji:'⚽',path:'soccer/por.1',important:true},{id:'ucl',label:'챔피언스리그',en:'UEFA Champions League',emoji:'⚽',path:'soccer/uefa.champions',important:true},{id:'kleague',label:'K리그1',en:'K League 1',emoji:'⚽',path:'soccer/kor.1',important:true},{id:'jleague',label:'일본 J리그',en:'J League',emoji:'⚽',path:'soccer/jpn.1',important:true}],
+ baseball:[{id:'mlb',label:'MLB',en:'MLB',emoji:'⚾',path:'baseball/mlb',important:true},{id:'npb',label:'일본 프로야구 (NPB)',en:'Nippon Professional Baseball',emoji:'⚾',path:null,important:true},{id:'kbo',label:'한국 프로야구 (KBO)',en:'Korea Baseball Organization',emoji:'⚾',path:null,important:true}]
+};
+const teamNames={
+'Atlanta Hawks':['애틀랜타 호크스','Atlanta Hawks'],'Boston Celtics':['보스턴 셀틱스','Boston Celtics'],'Brooklyn Nets':['브루클린 네츠','Brooklyn Nets'],'Charlotte Hornets':['샬럿 호네츠','Charlotte Hornets'],'Chicago Bulls':['시카고 불스','Chicago Bulls'],'Cleveland Cavaliers':['클리블랜드 캐벌리어스','Cleveland Cavaliers'],'Dallas Mavericks':['댈러스 매버릭스','Dallas Mavericks'],'Denver Nuggets':['덴버 너기츠','Denver Nuggets'],'Detroit Pistons':['디트로이트 피스턴스','Detroit Pistons'],'Golden State Warriors':['골든스테이트 워리어스','Golden State Warriors'],'Houston Rockets':['휴스턴 로키츠','Houston Rockets'],'Indiana Pacers':['인디애나 페이서스','Indiana Pacers'],'Los Angeles Clippers':['LA 클리퍼스','Los Angeles Clippers'],'Los Angeles Lakers':['LA 레이커스','Los Angeles Lakers'],'Memphis Grizzlies':['멤피스 그리즐리스','Memphis Grizzlies'],'Miami Heat':['마이애미 히트','Miami Heat'],'Milwaukee Bucks':['밀워키 벅스','Milwaukee Bucks'],'Minnesota Timberwolves':['미네소타 팀버울브스','Minnesota Timberwolves'],'New Orleans Pelicans':['뉴올리언스 펠리컨스','New Orleans Pelicans'],'New York Knicks':['뉴욕 닉스','New York Knicks'],'Oklahoma City Thunder':['오클라호마시티 썬더','Oklahoma City Thunder'],'Orlando Magic':['올랜도 매직','Orlando Magic'],'Philadelphia 76ers':['필라델피아 세븐티식서스','Philadelphia 76ers'],'Phoenix Suns':['피닉스 선즈','Phoenix Suns'],'Portland Trail Blazers':['포틀랜드 트레일블레이저스','Portland Trail Blazers'],'Sacramento Kings':['새크라멘토 킹스','Sacramento Kings'],'San Antonio Spurs':['샌안토니오 스퍼스','San Antonio Spurs'],'Toronto Raptors':['토론토 랩터스','Toronto Raptors'],'Utah Jazz':['유타 재즈','Utah Jazz'],'Washington Wizards':['워싱턴 위저즈','Washington Wizards'],
+'Arsenal':['아스널','Arsenal'],'Aston Villa':['애스턴 빌라','Aston Villa'],'Chelsea':['첼시','Chelsea'],'Liverpool':['리버풀','Liverpool'],'Manchester City':['맨체스터 시티','Manchester City'],'Manchester United':['맨체스터 유나이티드','Manchester United'],'Tottenham Hotspur':['토트넘 홋스퍼','Tottenham Hotspur'],'Newcastle United':['뉴캐슬 유나이티드','Newcastle United'],'Real Madrid':['레알 마드리드','Real Madrid'],'Barcelona':['바르셀로나','Barcelona'],'Atlético Madrid':['아틀레티코 마드리드','Atlético Madrid'],'Bayern Munich':['바이에른 뮌헨','Bayern Munich'],'Borussia Dortmund':['보루시아 도르트문트','Borussia Dortmund'],'Paris Saint-Germain':['파리 생제르맹','Paris Saint-Germain'],'Inter Milan':['인터 밀란','Inter Milan'],'AC Milan':['AC 밀란','AC Milan'],'Juventus':['유벤투스','Juventus'],'Napoli':['나폴리','Napoli'],'Porto':['포르투','Porto'],'Benfica':['벤피카','Benfica'],'Sporting CP':['스포르팅 CP','Sporting CP'],
+'Everton':['에버턴','Everton'],'West Ham United':['웨스트햄 유나이티드','West Ham United'],'Brighton & Hove Albion':['브라이턴 앤드 호브 앨비언','Brighton & Hove Albion'],'Wolverhampton Wanderers':['울버햄프턴 원더러스','Wolverhampton Wanderers'],'Fulham':['풀럼','Fulham'],'Brentford':['브렌트퍼드','Brentford'],'Crystal Palace':['크리스털 팰리스','Crystal Palace'],'Nottingham Forest':['노팅엄 포리스트','Nottingham Forest'],'Leicester City':['레스터 시티','Leicester City'],'Ipswich Town':['입스위치 타운','Ipswich Town'],'Southampton':['사우샘프턴','Southampton'],
+'Girona':['지로나','Girona'],'Athletic Club':['아틀레틱 빌바오','Athletic Club'],'Real Sociedad':['레알 소시에다드','Real Sociedad'],'Real Betis':['레알 베티스','Real Betis'],'Sevilla':['세비야','Sevilla'],'Villarreal':['비야레알','Villarreal'],'Valencia':['발렌시아','Valencia'],'Getafe':['헤타페','Getafe'],'Osasuna':['오사수나','Osasuna'],'Celta Vigo':['셀타 비고','Celta Vigo'],'Rayo Vallecano':['라요 바예카노','Rayo Vallecano'],'Mallorca':['마요르카','Mallorca'],'Las Palmas':['라스팔마스','Las Palmas'],'Alavés':['알라베스','Alavés'],
+'Bayer Leverkusen':['바이어 레버쿠젠','Bayer Leverkusen'],'RB Leipzig':['RB 라이프치히','RB Leipzig'],'Eintracht Frankfurt':['아인트라흐트 프랑크푸르트','Eintracht Frankfurt'],'VfB Stuttgart':['슈투트가르트','VfB Stuttgart'],'Borussia Mönchengladbach':['보루시아 묀헨글라트바흐','Borussia Mönchengladbach'],'Wolfsburg':['볼프스부르크','Wolfsburg'],'Freiburg':['프라이부르크','Freiburg'],'Werder Bremen':['베르더 브레멘','Werder Bremen'],'Hoffenheim':['호펜하임','Hoffenheim'],'Mainz':['마인츠','Mainz'],'Augsburg':['아우크스부르크','Augsburg'],'Lille':['릴','Lille'],'Marseille':['마르세유','Marseille'],'Monaco':['모나코','Monaco'],'Lyon':['리옹','Lyon'],'Nice':['니스','Nice'],'Rennes':['렌','Rennes'],'Lens':['랑스','Lens'],'Feyenoord':['페예노르트','Feyenoord'],'Ajax':['아약스','Ajax'],'PSV Eindhoven':['PSV 에인트호번','PSV Eindhoven'],'Celtic':['셀틱','Celtic'],'Rangers':['레인저스','Rangers'],
+'Los Angeles Dodgers':['LA 다저스','Los Angeles Dodgers'],'New York Yankees':['뉴욕 양키스','New York Yankees'],'Boston Red Sox':['보스턴 레드삭스','Boston Red Sox'],'Chicago Cubs':['시카고 컵스','Chicago Cubs'],'San Diego Padres':['샌디에이고 파드리스','San Diego Padres'],'Toronto Blue Jays':['토론토 블루제이스','Toronto Blue Jays'],'New York Mets':['뉴욕 메츠','New York Mets'],'Baltimore Orioles':['볼티모어 오리올스','Baltimore Orioles'],'Tampa Bay Rays':['탬파베이 레이스','Tampa Bay Rays'],'Toronto Blue Jays':['토론토 블루제이스','Toronto Blue Jays'],'Detroit Tigers':['디트로이트 타이거스','Detroit Tigers'],'Cleveland Guardians':['클리블랜드 가디언스','Cleveland Guardians'],'Kansas City Royals':['캔자스시티 로열스','Kansas City Royals'],'Minnesota Twins':['미네소타 트윈스','Minnesota Twins'],'Houston Astros':['휴스턴 애스트로스','Houston Astros'],'Texas Rangers':['텍사스 레인저스','Texas Rangers'],'Seattle Mariners':['시애틀 매리너스','Seattle Mariners'],'Oakland Athletics':['오클랜드 애슬레틱스','Oakland Athletics'],'Atlanta Braves':['애틀랜타 브레이브스','Atlanta Braves'],'Philadelphia Phillies':['필라델피아 필리스','Philadelphia Phillies'],'Miami Marlins':['마이애미 말린스','Miami Marlins'],'Washington Nationals':['워싱턴 내셔널스','Washington Nationals'],'Milwaukee Brewers':['밀워키 브루어스','Milwaukee Brewers'],'St. Louis Cardinals':['세인트루이스 카디널스','St. Louis Cardinals'],'Pittsburgh Pirates':['피츠버그 파이리츠','Pittsburgh Pirates'],'Cincinnati Reds':['신시내티 레즈','Cincinnati Reds'],'Arizona Diamondbacks':['애리조나 다이아몬드백스','Arizona Diamondbacks'],'Colorado Rockies':['콜로라도 로키스','Colorado Rockies'],'San Francisco Giants':['샌프란시스코 자이언츠','San Francisco Giants']
+};
+let sport='basketball', league=LEAGUES.basketball[0], matches=[], selected=null, filter='all', featured=true, cache=new Map();
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function names(n){
+ const direct=teamNames[n];if(direct)return direct;
+ const key=String(n||'').trim();
+ const aliases={
+  'Manchester Utd':'맨체스터 유나이티드','Man United':'맨체스터 유나이티드','Man City':'맨체스터 시티','Spurs':'토트넘 홋스퍼','Atlético de Madrid':'아틀레티코 마드리드','Atletico Madrid':'아틀레티코 마드리드','Paris Saint-Germain FC':'파리 생제르맹','PSG':'파리 생제르맹','Internazionale':'인터 밀란','Inter':'인터 밀란','Milan':'AC 밀란','Leverkusen':'바이어 레버쿠젠','RB Leipzig':'RB 라이프치히','B. Dortmund':'보루시아 도르트문트','Bayern':'바이에른 뮌헨',
+  'LA Dodgers':'LA 다저스','New York Yankees':'뉴욕 양키스','Athletics':'오클랜드 애슬레틱스','D-backs':'애리조나 다이아몬드백스','White Sox':'시카고 화이트삭스','Chicago White Sox':'시카고 화이트삭스','Cubs':'시카고 컵스','Mets':'뉴욕 메츠','Giants':'샌프란시스코 자이언츠','Padres':'샌디에이고 파드리스','Phillies':'필라델피아 필리스','Braves':'애틀랜타 브레이브스','Reds':'신시내티 레즈','Brewers':'밀워키 브루어스','Royals':'캔자스시티 로열스','Twins':'미네소타 트윈스','Guardians':'클리블랜드 가디언스','Orioles':'볼티모어 오리올스','Rays':'탬파베이 레이스','Mariners':'시애틀 매리너스','Astros':'휴스턴 애스트로스','Rangers':'텍사스 레인저스'
+ };
+ return aliases[key]?[aliases[key],key]:[key,key];
+}
+function fmtTime(d){return new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',month:'2-digit',day:'2-digit',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(d))}
+function ymd(d){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}
+function shift(date,days){let d=new Date(date+'T12:00:00+09:00');d.setDate(d.getDate()+days);return ymd(d)}
+function dayLabel(day){let d=new Date(day+'T12:00:00+09:00');return new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',month:'numeric',day:'numeric',weekday:'short'}).format(d)}
+function renderDays(){const d=$('date').value||ymd(new Date());$('daybar').innerHTML=Array.from({length:7},(_,i)=>{let x=shift(d,i-2);return `<button class="daybtn ${x===d?'active':''}" data-day="${x}">${i===2?'선택일 ':''}${dayLabel(x)}</button>`}).join('');$('daybar').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('date').value=b.dataset.day;renderDays();loadGames()})}
+function renderLeagues(){let html='';for(const [key,list] of Object.entries(LEAGUES)){html+=`<div class="group"><div class="groupname">${key==='basketball'?'🏀 농구 리그':key==='soccer'?'⚽ 축구 리그':'⚾ 야구 리그'}</div>${list.map(l=>`<button class="leaguebtn ${l.id===league.id?'active':''}" data-id="${l.id}"><span class="em">${l.emoji}</span><span>${l.label}</span>${l.id===league.id?'<span class="check">✓</span>':''}</button>`).join('')}</div>`}$('leagueGroups').innerHTML=html;$('leagueGroups').querySelectorAll('button').forEach(b=>b.onclick=()=>{for(const arr of Object.values(LEAGUES)){const f=arr.find(x=>x.id===b.dataset.id);if(f){league=f;sport=Object.keys(LEAGUES).find(k=>LEAGUES[k]===arr);break}}document.querySelectorAll('.sport').forEach(x=>x.classList.toggle('active',x.dataset.sport===sport));renderLeagues();loadGames()})}
+function normalizeEvent(ev){const comp=ev.competitions?.[0];if(!comp)return null;const competitors=comp.competitors||[];const h=competitors.find(c=>c.homeAway==='home')||competitors[0],a=competitors.find(c=>c.homeAway==='away')||competitors[1];if(!h||!a)return null;const status=ev.status?.type||{};const state=status.state||'pre';const home=h.team?.displayName||h.team?.name||'Home';const away=a.team?.displayName||a.team?.name||'Away';return {id:ev.id||`${home}-${away}-${ev.date}`,home,away,homeTeamId:h.team?.id||'',awayTeamId:a.team?.id||'',homeLogo:h.team?.logo||h.team?.logos?.[0]?.href||'',awayLogo:a.team?.logo||a.team?.logos?.[0]?.href||'',date:ev.date||new Date().toISOString(),status:state==='in'?'실시간':state==='post'?'종료':'예정',state,live:state==='in',done:state==='post',hasScore:h.score!=null&&a.score!=null,hs:Number(h.score),as:Number(a.score),league:league.label,path:league.path,emoji:league.emoji,venue:comp.venue?.fullName||'',broadcast:comp.broadcasts?.[0]?.names?.join(', ')||'',raw:ev}}
+async function loadGames(){
+matches=[];selected=null;$('matches').innerHTML='<div class="empty">실제 경기 일정을 불러오는 중…</div>';$('scheduleState').textContent=`${league.label} · ${$('date').value} · 데이터 조회 중`;$('count').textContent='조회 중';renderDays();
+if(!league.path){$('matches').innerHTML=`<div class="empty"><b>${league.label} 자동 일정 피드가 연결되어 있지 않습니다.</b><br>공식 일정에서 실제 경기를 확인해 주세요.<br><br><a href="${league.id==='kbo'?'https://eng.koreabaseball.com/Schedule/DailySchedule.aspx':'https://npb.jp/games/'}" target="_blank" rel="noopener" style="color:#77b6ff">공식 일정 열기 ↗</a></div>`;$('scheduleState').textContent='공식 일정 링크 제공 · 자동 피드 미연결';$('count').textContent='외부 피드 미연결';return}
+const day=$('date').value||ymd(new Date());const key=league.path+'|KST|'+day;
+try{
+ let data=cache.get(key);
+ if(!data){
+  const queryDays=[shift(day,-1),day,shift(day,1)];
+  const payloads=await Promise.all(queryDays.map(async qd=>{
+   const urls=[
+    `https://site.api.espn.com/apis/site/v2/sports/${league.path}/scoreboard?dates=${qd.replaceAll('-','')}&limit=100`,
+    `https://site.web.api.espn.com/apis/site/v2/sports/${league.path}/scoreboard?dates=${qd.replaceAll('-','')}&limit=100`,
+    ...(sport==='soccer'?[`https://cdn.espn.com/core/soccer/scoreboard?xhr=1&league=${league.path.replace(/^soccer\//,'')}&date=${qd.replaceAll('-','')}`]:[])
+   ];
+   for(const url of urls){try{const res=await fetch(url,{cache:'no-store'});if(!res.ok)continue;const j=await res.json();let events=j.events||j.content?.events||j.events?.items||[];if(!events.length&&j.content&&Array.isArray(j.content.events))events=j.content.events;if(events.length)return {events,source:url.includes('cdn.espn.com')?'ESPN CDN':'ESPN Site API'};}catch(e){}}
+   return {events:[],source:'피드 응답 없음'};
+  }));
+  const unique=new Map();payloads.forEach(j=>(j.events||[]).forEach(ev=>unique.set(ev.id||`${ev.date}-${ev.name}`,ev)));
+  data={events:[...unique.values()],source:payloads.find(x=>x.events.length)?.source||'피드 응답 없음'};cache.set(key,data)
+ }
+ matches=(data.events||[]).map(normalizeEvent).filter(Boolean).filter(m=>ymd(new Date(m.date))===day);
+ applyFilter();$('scheduleState').textContent=`${league.label} · ${dayLabel(day)} · ${data.source||'실제 공개 피드'} · 한국시간 기준`;
+ if(!matches.length){
+  const official=league.id==='kleague'?'https://www.kleague.com/schedule.do':league.id==='jleague'?'https://www.jleague.jp/match/':'';
+  $('matches').innerHTML=`<div class="empty"><b>${esc(league.label)} 경기 데이터를 자동 피드에서 찾지 못했습니다.</b><br>이 날짜에 경기가 없거나 ESPN 피드가 해당 리그를 제공하지 않을 수 있습니다.${official?`<br><br><a href="${official}" target="_blank" rel="noopener" style="color:#77b6ff">${esc(league.label)} 공식 일정 열기 ↗</a>`:''}<br><br>날짜를 바꿔 다시 조회해 주세요. 확인되지 않은 경기를 임의로 만들지는 않았습니다.</div>`;
+ }
+}catch(e){$('matches').innerHTML=`<div class="empty">일정 조회에 실패했습니다.<br>${esc(e.message)}<br><br>공개 데이터 제공처가 해당 리그를 지원하지 않거나 브라우저 연결이 차단되었을 수 있습니다.</div>`;$('scheduleState').textContent='일정 피드 조회 실패'}
+$('count').textContent=`${matches.length}경기`
+}
+function applyFilter(){let arr=matches.filter(m=>filter==='all'||filter==='live'&&m.live||filter==='upcoming'&&m.state==='pre'||filter==='done'&&m.done);if(featured)arr=arr.slice(0,24);$('matches').innerHTML=arr.length?arr.map((m,i)=>`<div class="match ${selected?.id===m.id?'selected':''} ${m.done?'completed-match':''}"><div class="time">${m.done?'<span class="status-completed">종료됨</span>':m.live?'<span class="status-live">LIVE</span>':fmtTime(m.date).split(' ')[2]||fmtTime(m.date).slice(-5)}</div><div class="pair"><div class="pairtext"><div class="teamline"><span class="teamname"><img class="teamlogo" src="${esc(m.homeLogo||'')}" alt="" onerror="this.style.display='none'"><b>${esc(names(m.home)[0])}</b></span><span class="versus">${m.done?`${m.hs} : ${m.as}`:'vs'}</span><span class="teamname"><img class="teamlogo" src="${esc(m.awayLogo||'')}" alt="" onerror="this.style.display='none'"><b>${esc(names(m.away)[0])}</b></span></div><small><span class="status ${m.live?'live':m.done?'done':''}">${m.done?'경기 종료':m.status}</span> · ${esc(m.league)} · ${esc(fmtTime(m.date))}${m.venue?' · '+esc(m.venue):''}</small></div></div><button class="miniBtn" data-select="${m.id}">분석 보기</button></div>`).join(''):$('matches').innerHTML='<div class="empty">선택한 조건에 맞는 경기가 없습니다.</div>';$('matches').querySelectorAll('[data-select]').forEach(b=>b.onclick=()=>chooseMatch(matches.find(m=>m.id===b.dataset.select)))}
+function addForm(id,rows,team){$(id).innerHTML=rows.length?rows.slice(0,5).map(m=>{let isHome=m.home===team,forS=isHome?m.hs:m.as,against=isHome?m.as:m.hs;return `<span class="formchip ${forS<against?'l':''}">${forS>against?'W':forS<against?'L':'D'}</span>`}).join(''):'<span class="minor">기록 없음</span>'}
+async function recentGames(team){const key=league.path+'|form|'+team;if(cache.has(key))return cache.get(key);let days=Array.from({length:45},(_,i)=>shift($('date').value||ymd(new Date()),-i-1));let events=[];await Promise.all(days.map(async d=>{try{const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/${league.path}/scoreboard?dates=${d.replaceAll('-','')}&limit=100`);if(!r.ok)return;const j=await r.json();for(const ev of j.events||[]){let m=normalizeEvent(ev);if(m&&m.done&&m.hasScore&&(m.home===team||m.away===team))events.push(m)}}catch(e){}}));events.sort((a,b)=>new Date(b.date)-new Date(a.date));let result=[...new Map(events.map(m=>[m.id,m])).values()].slice(0,5);cache.set(key,result);return result}
+function stats(team,rows){let w=0,l=0,d=0,sc=0,ag=0,n=0;for(const m of rows){const home=m.home===team, f=home?m.hs:m.as,a=home?m.as:m.hs;if(!Number.isFinite(f)||!Number.isFinite(a))continue;n++;sc+=f;ag+=a;if(f>a)w++;else if(f<a)l++;else d++}return {n,w,l,d,for:n?sc/n:0,against:n?ag/n:0,margin:n?(sc-ag)/n:0}}
+
+const playerKoNames={
+'mouhamed gueye':'무하메드 게예','henri veesaar':'앙리 베사르','devin carter':'데빈 카터',
+'tyler bilodeau':'타일러 빌로도','grant williams':'그랜트 윌리엄스','coby white':'코비 화이트',
+'kon knueppel':'콘 크누펠','kylan boswell':'카일런 보스웰','jett howard':'젯 하워드',
+'joey wentz':'조이 웬츠','jackson holliday':'잭슨 홀리데이','cade povich':'케이드 포비치',
+'jordan westburg':'조던 웨스트버그','kyle bradish':'카일 브래디시',"tyler o'neill":'타일러 오닐',
+'ryan helsley':'라이언 헬슬리','ryan mountcastle':'라이언 마운트캐슬','reed trimble':'리드 트림블',
+'colin selby':'콜린 셀비','keegan akin':'키건 에이킨','cameron foster':'캐머런 포스터'
+};
+function playerKo(n){return playerKoNames[String(n||'').trim().toLowerCase()]||n}
+function injuryKo(v){
+ const s=String(v||'').trim();
+ const d={'fracture':'골절','knee':'무릎 부상','illness':'질병','shoulder':'어깨 부상','hamstring':'햄스트링 부상','strain':'근육 염좌','surgery':'수술','soreness':'통증','inflammation':'염증','ankle':'발목 부상','foot':'발 부상','back':'허리 부상','hip':'엉덩이 부상','wrist':'손목 부상','hand':'손 부상','elbow':'팔꿈치 부상','groin':'사타구니 부상','concussion':'뇌진탕','calf':'종아리 부상','thigh':'허벅지 부상'};
+ return d[s.toLowerCase()]||s;
+}
+
+function injuryStatusText(s){let v=String(s||'상태 미제공').toLowerCase();if(/out|inactive|ruled out|결장/.test(v))return ['결장','tagred'];if(/question|doubt|game-time|day.to.day|불확실/.test(v))return ['출전 불투명','tagyellow'];if(/probable|available|active|출전 가능/.test(v))return ['출전 가능','taggreen'];return [s||'상태 미제공','']}
+
+const standingsCache={};
+async function teamRankLabel(m,teamName){
+ try{
+  if(!m?.path)return '';
+  if(!standingsCache[m.path])standingsCache[m.path]=fetch(`https://site.api.espn.com/apis/site/v2/sports/${m.path}/standings`,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
+  const data=await standingsCache[m.path];if(!data)return '';
+  const wanted=String(teamName||'').toLowerCase().replace(/[^a-z0-9]/g,'');let found='';
+  function walk(o){
+   if(!o||typeof o!=='object'||found)return;
+   if(Array.isArray(o)){o.forEach(walk);return}
+   const t=o.team||o;const n=String(t.displayName||t.name||t.shortDisplayName||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+   const stats=o.stats||o.records||[];
+   if(n&&wanted&&(n===wanted||n.includes(wanted)||wanted.includes(n))&&Array.isArray(stats)){
+    const q=stats.find(x=>/rank|playoffseed|seed/i.test(String(x.name||x.type||'')));
+    if(q&&(q.value!=null||q.displayValue))found=String(q.value??q.displayValue);
+   }
+   Object.values(o).forEach(v=>{if(v&&typeof v==='object')walk(v)});
+  }
+  walk(data);return found?`리그 ${found}위`:'';
+ }catch(e){return ''}
+}
+
+async function injuriesFor(m){
+ $('injuryStamp').textContent='선택한 두 팀 부상자 조회 중';
+ $('injuries').innerHTML='<div class="empty">선택한 두 팀의 부상자 정보를 조회하는 중…</div>'; 
+ if(!m || !m.path){
+  $('injuries').innerHTML='<div class="empty">이 리그의 부상자 피드 경로가 없습니다. 부상자가 없다는 뜻은 아닙니다.</div>';
+  $('injuryStamp').textContent='피드 경로 없음'; return;
+ }
+ try{
+  const urls=[
+   `https://site.api.espn.com/apis/site/v2/sports/${m.path}/injuries`,
+   `https://site.web.api.espn.com/apis/site/v2/sports/${m.path}/injuries`
+  ];
+  const results=await Promise.all(urls.map(async url=>{
+   try{const r=await fetch(url,{cache:'no-store'});if(!r.ok)return {ok:false,url,status:r.status};return {ok:true,url,data:await r.json()}}
+   catch(e){return {ok:false,url,error:String(e)}}
+  }));
+  const rows=[],seen=new Set();
+  const str=v=>typeof v==='string'||typeof v==='number'?String(v):'';
+  function walk(o,inheritedTeam=''){
+   if(!o||typeof o!=='object')return;
+   if(Array.isArray(o)){o.forEach(v=>walk(v,inheritedTeam));return}
+   const teamObj=o.team||o.teamInfo||inheritedTeam||'';
+   const team=typeof teamObj==='string'?teamObj:(teamObj.displayName||teamObj.name||teamObj.shortDisplayName||teamObj.abbreviation||'');
+   const athlete=o.athlete||o.player||o.participant?.athlete;
+   if(athlete&&typeof athlete==='object'){
+    const name=athlete.displayName||athlete.fullName||athlete.name||athlete.shortName||'';
+    const injury=o.injury||o.injuries?.[0]||o;
+    const statusObj=injury.status||injury.injuryStatus||injury.availability||athlete.status||injury.type;
+    const status=(typeof statusObj==='object'?(statusObj.type?.description||statusObj.type?.name||statusObj.description||statusObj.name||statusObj.abbreviation):str(statusObj))||'상태 미제공';
+    const detail=injury.details?.detail||injury.details?.type||injury.detail||injury.description||injury.location||injury.type?.description||injury.type?.name||injury.notes||'';
+    if(name&&(o.status||o.type||o.details||o.injury||o.injuries||o.injuryStatus||o.availability||o.location||o.description)){
+     const key=[name,team,status,detail].join('|').toLowerCase();
+     if(!seen.has(key)){seen.add(key);rows.push({name,team,status:String(status),detail:String(detail||'')})}
+    }
+   }
+   for(const [k,v] of Object.entries(o)) if(v&&typeof v==='object') walk(v,team||inheritedTeam);
+  }
+  results.filter(x=>x.ok).forEach(x=>walk(x.data));
+  const norm=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9가-힣]/g,'');
+  const homeNames=[m.home,...(typeof names==='function'?names(m.home):[])].map(norm).filter(Boolean);
+  const awayNames=[m.away,...(typeof names==='function'?names(m.away):[])].map(norm).filter(Boolean);
+  function belongs(row,team,keys){
+   if(!row.team)return false;
+   const t=norm(row.team);
+   return keys.some(k=>k&&(k===t||k.includes(t)||t.includes(k)));
+  }
+  const homeRows=rows.filter(x=>belongs(x,m.home,homeNames));
+  const awayRows=rows.filter(x=>belongs(x,m.away,awayNames));
+  const anyRows=rows.filter(x=>!x.team);
+  // Some older ESPN feeds omit team metadata; show those rows rather than falsely reporting no data.
+  const displayHome=homeRows.length?homeRows:(rows.length&&!awayRows.length?anyRows:[]);
+  const displayAway=awayRows.length?awayRows:[];
+  if(!displayHome.length&&!displayAway.length){
+   const ok=results.filter(x=>x.ok).length;
+   $('injuries').innerHTML=`<div class="empty"><b>${ok?'피드는 응답했지만 선수별 부상 항목이 확인되지 않았습니다.':'부상자 피드 연결에 실패했습니다.'}</b><br><span class="minor">${ok}/${results.length}개 리그 피드 응답 성공 · ${rows.length}건 파싱</span><br><span class="minor">정보 미제공은 부상자가 없다는 뜻이 아닙니다.</span></div>`;
+   $('injuryStamp').textContent=ok?'선수 항목 없음':'피드 연결 실패';return;
+  }
+  const table=(team,list)=>`<div class="teaminj"><h3>${esc(names(team)[0])}<span class="playereng">${esc(names(team)[1])}</span></h3><div class="inner">${list.length?`<table class="injurytable"><thead><tr><th>선수</th><th>상태</th><th>부상 정보</th></tr></thead><tbody>${list.map(x=>{const st=injuryStatusText(x.status);return `<tr><td><b>${esc(playerKo(x.name))}</b><span class="playereng">${esc(x.name)}</span></td><td class="${st[1]}">${esc(st[0])}</td><td>${esc(injuryKo(x.detail||'세부 정보 미제공'))}</td></tr>`}).join('')}</tbody></table>`:'<div class="empty">공개 피드에서 확인된 부상자 없음<br><span class="minor">정보 미제공은 부상자가 없다는 뜻이 아닙니다.</span></div>'}</div></div>`;
+  $('injuries').innerHTML=`<div class="injurycols">${table(m.home,displayHome)}${table(m.away,displayAway)}</div><div class="minor" style="padding:10px 2px">선택한 두 팀에 해당하는 선수만 표시합니다. 공개 피드에 부상 정보가 없으면 표시되지 않을 수 있습니다.</div>`;
+  $('injuryStamp').textContent=`리그 피드 조회 완료 · ${displayHome.length+displayAway.length}명`;
+  const ranks=await Promise.all([teamRankLabel(m,m.home),teamRankLabel(m,m.away)]);
+  $('injuries').querySelectorAll('.teaminj h3').forEach((h,i)=>{if(ranks[i]){const b=document.createElement('span');b.textContent=ranks[i];b.style.cssText='display:inline-block;margin-left:8px;padding:3px 7px;border-radius:8px;background:#223b59;color:#b9d9ff;font-size:12px;font-weight:700';h.appendChild(b)}});
+ }catch(e){
+  $('injuries').innerHTML=`<div class="empty">부상자 조회 오류: ${esc(e.message)}<br><span class="minor">부상자가 없다는 뜻은 아닙니다.</span></div>`;
+  $('injuryStamp').textContent='조회 오류';
+ }
+}
+async function chooseMatch(m){if(!m)return;selected=m;applyFilter();$('analysisStatus').textContent='최근 경기 조회 중';$('matchMeta').textContent=`${m.league} · ${fmtTime(m.date)} · ${m.status}${m.venue?' · '+m.venue:''}`;$('homeIcon').innerHTML=m.homeLogo?`<img class="detail-logo" src="${esc(m.homeLogo)}" alt="${esc(names(m.home)[0])} 로고" onerror="this.style.display='none'">`:'<span class="logo-fallback">팀</span>';$('awayIcon').innerHTML=m.awayLogo?`<img class="detail-logo" src="${esc(m.awayLogo)}" alt="${esc(names(m.away)[0])} 로고" onerror="this.style.display='none'">`:'<span class="logo-fallback">팀</span>';$('homeKo').textContent=names(m.home)[0];$('awayKo').textContent=names(m.away)[0];$('homeEn').textContent=names(m.home)[1];$('awayEn').textContent=names(m.away)[1];$('detailContent').innerHTML='<div class="empty">양 팀 최근 경기 기록을 불러오는 중…</div>';addForm('homeForm',[],m.home);addForm('awayForm',[],m.away);$('summary').innerHTML='<li><span class="dot">●</span>실제 최근 경기 데이터 조회 중</li>';injuriesFor(m);try{const [h,a]=await Promise.all([recentGames(m.home),recentGames(m.away)]);if(selected?.id!==m.id)return;const hs=stats(m.home,h),as=stats(m.away,a);addForm('homeForm',h,m.home);addForm('awayForm',a,m.away);let valid=hs.n>=2&&as.n>=2;let expectedH=(hs.for+as.against)/2,expectedA=(as.for+hs.against)/2,total=expectedH+expectedA;let diff=(hs.margin-as.margin)/(sport==='basketball'?14:sport==='baseball'?4:1.8)+(hs.w/Math.max(1,hs.n)-as.w/Math.max(1,as.n))*1.2;let prob=Math.round(Math.max(8,Math.min(92,50+diff*12+(sport==='soccer'?2:4))));let scoreText=m.hasScore?`${m.hs} : ${m.as}`:valid?`${expectedH.toFixed(1)} : ${expectedA.toFixed(1)}`:'표본 부족';$('detailContent').innerHTML=`
+<div class="statsgrid"><div class="statcard"><span>${esc(names(m.home)[0])} 승리 추정</span><b class="green">${valid?prob+'%':'—'}</b><div class="bar"><i style="width:${valid?prob:50}%"></i></div></div><div class="statcard"><span>${esc(names(m.away)[0])} 승리 추정</span><b class="blue">${valid?(100-prob)+'%':'—'}</b><div class="bar away"><i style="width:${valid?100-prob:50}%"></i></div></div></div>
+<div class="compare"><h3>주요 지표 비교 · 최근 완료 경기</h3>${[['평균 득점',hs.for,as.for],['평균 실점',hs.against,as.against],['승리',hs.w,as.w],['득실 차',hs.margin,as.margin]].map(([label,x,y])=>{let max=Math.max(Math.abs(x),Math.abs(y),1);return `<div class="barrow"><b>${Number(x).toFixed(1)}</b><div class="bar"><i style="width:${Math.abs(x)/max*100}%"></i></div><span class="barlabel">${label}</span><div class="bar away"><i style="width:${Math.abs(y)/max*100}%"></i></div><b style="text-align:right">${Number(y).toFixed(1)}</b></div>`}).join('')}</div>
+<div class="compare"><h3>최근 경기 표본 및 흐름</h3><div class="minor">${esc(names(m.home)[0])}: ${hs.n}경기 · ${hs.w}승 ${hs.d}무 ${hs.l}패 · 평균 득점 ${hs.for.toFixed(1)} / 실점 ${hs.against.toFixed(1)} · 득실 차 ${hs.margin>=0?'+':''}${hs.margin.toFixed(1)}</div><div class="minor" style="margin-top:7px">${esc(names(m.away)[0])}: ${as.n}경기 · ${as.w}승 ${as.d}무 ${as.l}패 · 평균 득점 ${as.for.toFixed(1)} / 실점 ${as.against.toFixed(1)} · 득실 차 ${as.margin>=0?'+':''}${as.margin.toFixed(1)}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div><b style="font-size:11px">${esc(names(m.home)[0])} 최근 완료 경기</b>${h.length?h.slice(0,5).map(g=>`<div class="minor" style="padding:7px 0;border-bottom:1px solid #203249">${esc(fmtTime(g.date))}<br><b style="color:${(g.home===m.home?g.hs>g.as:g.as>g.hs)?'#50e0ad':(g.home===m.home?g.hs<g.as:g.as<g.hs)?'#ff6b82':'#d3deec'}">${esc(names(g.home)[0])} ${g.hs}:${g.as} ${esc(names(g.away)[0])}</b></div>`).join(''):'<div class="minor">최근 경기 기록을 확인하지 못했습니다.</div>'}</div><div><b style="font-size:11px">${esc(names(m.away)[0])} 최근 완료 경기</b>${a.length?a.slice(0,5).map(g=>`<div class="minor" style="padding:7px 0;border-bottom:1px solid #203249">${esc(fmtTime(g.date))}<br><b style="color:${(g.home===m.away?g.hs>g.as:g.as>g.hs)?'#50e0ad':(g.home===m.away?g.hs<g.as:g.as<g.hs)?'#ff6b82':'#d3deec'}">${esc(names(g.home)[0])} ${g.hs}:${g.as} ${esc(names(g.away)[0])}</b></div>`).join(''):'<div class="minor">최근 경기 기록을 확인하지 못했습니다.</div>'}</div></div></div>
+<div class="compare"><h3>언더 / 오버 기준점</h3><div class="minor" style="margin-bottom:8px">예상 점수 / 골 <b class="gold">${valid?expectedH.toFixed(1)+' : '+expectedA.toFixed(1):'산출 불가'}</b> <span style="margin-left:6px">${m.hasScore?(m.done?'실제 최종 점수와 별도 추정':'현재 점수와 별도 추정'):'최근 득실 평균 기반'}</span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label class="minor">언오버</label><input id="totalLine" class="control" style="width:90px" type="number" step=".5" value="${sport==='soccer'?'2.5':sport==='baseball'?'8.5':'220.5'}"><button class="miniBtn" id="calcTotal">합계 비교</button><b id="totalResult" class="gold">—</b></div><div class="minor" style="margin-top:10px">예상 합계 ${valid?total.toFixed(1):'산출 불가'}</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:12px"><div style="border:1px solid #263b52;border-radius:10px;padding:10px"><div class="minor" style="margin-bottom:7px">홈팀 마이너스 핸디캡 (-)</div><div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap"><span class="minor">홈팀 -</span><input id="handicapMinusLine" class="control" style="width:78px" type="number" min="0" step=".5" value="${sport==='soccer'?'0.5':sport==='baseball'?'1.5':'3.5'}"><button class="miniBtn" id="calcHandicapMinus">비교</button></div><b id="handicapMinusResult" class="gold" style="display:block;margin-top:8px">—</b></div><div style="border:1px solid #263b52;border-radius:10px;padding:10px"><div class="minor" style="margin-bottom:7px">홈팀 플러스 핸디캡 (+)</div><div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap"><span class="minor">홈팀 +</span><input id="handicapPlusLine" class="control" style="width:78px" type="number" min="0" step=".5" value="${sport==='soccer'?'0.5':sport==='baseball'?'1.5':'3.5'}"><button class="miniBtn" id="calcHandicapPlus">비교</button></div><b id="handicapPlusResult" class="gold" style="display:block;margin-top:8px">—</b></div></div><div class="minor" style="margin-top:8px">예상 점수 차 (홈 - 원정): ${valid?(expectedH-expectedA>=0?'+':'')+(expectedH-expectedA).toFixed(1):'산출 불가'} · 마이너스는 홈팀이 해당 점수 차 이상 이겨야 유리하고, 플러스는 홈팀 예상 점수에 핸디캡을 더해 비교합니다. 예상치는 최근 득실 평균 기반이며 확정 예측이 아닙니다.</div></div>
+<div class="minor" style="padding:10px 0">${valid?'최근 완료 경기의 평균 득점·실점과 단순 홈 이점으로 계산했습니다. 검증된 머신러닝 승률이 아닙니다.':'최근 경기 표본이 부족하여 승리 확률을 표시하지 않았습니다.'} ${m.hasScore?'실제 점수와 사전 추정은 별개입니다.':''}</div>`;
+$('calcTotal').onclick=()=>{let line=Number($('totalLine').value);$('totalResult').textContent=!valid?'표본 부족':total>line?'오버 쪽':total<line?'언더 쪽':'기준점과 동일'};const handicapText=adjusted=>!valid?'표본 부족':adjusted>0?'핸디캡 적용 후 홈팀 우세':adjusted<0?'핸디캡 적용 후 원정팀 우세':'핸디캡 적용 후 동률';$('calcHandicapMinus').onclick=()=>{let line=Math.abs(Number($('handicapMinusLine').value));let margin=expectedH-expectedA;$('handicapMinusResult').textContent=handicapText(margin-line)};$('calcHandicapPlus').onclick=()=>{let line=Math.abs(Number($('handicapPlusLine').value));let margin=expectedH-expectedA;$('handicapPlusResult').textContent=handicapText(margin+line)};$('analysisStatus').textContent=valid?'최근 폼 기반 추정':'표본 부족';const marginGap=hs.margin-as.margin;const winRateH=hs.n?hs.w/hs.n:0,winRateA=as.n?as.w/as.n:0;const reasons=valid?[`${names(m.home)[0]} 최근 ${hs.n}경기 ${hs.w}승 ${hs.d}무 ${hs.l}패 · 평균 득실차 ${hs.margin>=0?'+':''}${hs.margin.toFixed(1)}`,`${names(m.away)[0]} 최근 ${as.n}경기 ${as.w}승 ${as.d}무 ${as.l}패 · 평균 득실차 ${as.margin>=0?'+':''}${as.margin.toFixed(1)}`,`폼 비교: 최근 승률 ${Math.round(winRateH*100)}% 대 ${Math.round(winRateA*100)}% · 득실차 격차 ${marginGap>=0?'+':''}${marginGap.toFixed(1)}`,`예상 점수 근거: 각 팀 평균 득점과 상대 평균 실점을 조합해 산출 (${expectedH.toFixed(1)} : ${expectedA.toFixed(1)})`,`판단: ${prob>54?names(m.home)[0]+' 쪽 우세':prob<46?names(m.away)[0]+' 쪽 우세':'전력 차이가 작아 접전 예상'} · 단순 통계 추정이며 확정 예측 아님`]:[`최근 경기 표본 부족: 홈팀 ${hs.n}경기 / 원정팀 ${as.n}경기`,`양 팀 모두 최소 2경기 이상 데이터가 확보되지 않아 신뢰도 있는 승률·예상 점수를 산출하지 않음`,'부상·출전 정보는 실제 공개 피드에서 확인되는 경우에만 반영'];reasons.push('신뢰도 안내: 최근 경기 표본과 공개 데이터에 기반한 통계 요약이며, 실시간 배당·라인업·부상 소식 전체를 반영한 전문 AI 모델은 아님');$('summary').innerHTML=reasons.map((t,i)=>`<li><span class="dot">${i===4&&valid?'◆':'●'}</span>${esc(t)}</li>`).join('')}catch(e){$('detailContent').innerHTML=`<div class="empty">분석 데이터 조회 실패: ${esc(e.message)}</div>`;$('analysisStatus').textContent='분석 실패'}}
+document.querySelectorAll('.sport').forEach(b=>b.onclick=()=>{sport=b.dataset.sport;league=LEAGUES[sport][0];document.querySelectorAll('.sport').forEach(x=>x.classList.toggle('active',x===b));renderLeagues();loadGames()});
+document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));applyFilter()});
+$('date').value=ymd(new Date());$('date').onchange=()=>{renderDays();loadGames()};$('loadBtn').onclick=loadGames;$('refresh').onclick=()=>{cache.clear();loadGames()};$('featured').onclick=()=>{featured=!featured;$('featured').style.borderColor=featured?'#0878ff':'#2a3c53';$('importantOnly').checked=featured;applyFilter()};$('importantOnly').onchange=e=>{featured=e.target.checked;applyFilter()};$('live').onclick=()=>{filter='live';document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x.dataset.filter==='live'));loadGames()};document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-detail]').forEach(x=>x.classList.toggle('active',x===b));if(!selected)return;if(b.dataset.detail==='injury')$('injuries').scrollIntoView({behavior:'smooth',block:'center'});else if(b.dataset.detail==='form')$('detailContent').scrollIntoView({behavior:'smooth',block:'center'});else $('detailContent').scrollIntoView({behavior:'smooth',block:'start'})});
+renderLeagues();renderDays();loadGames();
+</script>
+</body></html>
