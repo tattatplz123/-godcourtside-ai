@@ -235,7 +235,15 @@ function playerKo(n){
   'victor oladipo':'빅터 올라디포','russell westbrook':'러셀 웨스트브룩','chris paul':'크리스 폴',
   'deandre hunter':'디안드레 헌터','clint capela':'클린트 카펠라','bogdan bogdanovic':'보그단 보그다노비치',
   'dyson daniels':'다이슨 대니얼스','onyeka okongwu':'오네카 오콩우','keldon johnson':'켈든 존슨',
-  'jeremy sochan':'제레미 소찬','devin vassell':'데빈 바셀','harrison barnes':'해리슨 반스'
+  'jeremy sochan':'제레미 소찬','devin vassell':'데빈 바셀','harrison barnes':'해리슨 반스',
+  'trey alexander':'트레이 알렉산더','jusuf nurkic':'유수프 누르키치','lauri markkanen':'라우리 마카넨',
+  'collin sexton':'콜린 섹스턴','john collins':'존 콜린스','keyonte george':'키욘테 조지',
+  'walker kessler':'워커 케슬러','brice sensabaugh':'브라이스 센서보','kyle filipowski':'카일 필리포스키',
+  'isaiah collier':'아이제이아 콜리어','cody williams':'코디 윌리엄스','svi mykhailiuk':'스비 미하일류크',
+  'jordan clarkson':'조던 클락슨','kevin love':'케빈 러브','herbert jones':'허버트 존스',
+  'trey murphy iii':'트레이 머피 3세','dejounte murray':'데준테 머리','jordan hawkins':'조던 호킨스',
+  'zion williamson':'자이언 윌리엄슨','brandon ingram':'브랜든 잉그램','cj mccollum':'CJ 맥컬럼',
+  'yves missi':'이브 미시','jose alvarado':'호세 알바라도','herb jones':'허브 존스'
  };
  if(dict[key])return dict[key];
  if(typeof playerKoNames!=='undefined'&&playerKoNames[key])return playerKoNames[key];
@@ -243,12 +251,47 @@ function playerKo(n){
  return raw;
 }
 function injuryKo(v){
- const s=String(v||'').trim();
- const d={'fracture':'골절','knee':'무릎 부상','illness':'질병','shoulder':'어깨 부상','hamstring':'햄스트링 부상','strain':'근육 염좌','surgery':'수술','soreness':'통증','inflammation':'염증','ankle':'발목 부상','foot':'발 부상','back':'허리 부상','hip':'엉덩이 부상','wrist':'손목 부상','hand':'손 부상','elbow':'팔꿈치 부상','groin':'사타구니 부상','concussion':'뇌진탕','calf':'종아리 부상','thigh':'허벅지 부상'};
- return d[s.toLowerCase()]||s;
+ const raw=String(v||'').trim(); if(!raw)return '세부 정보 미제공';
+ const s=raw.toLowerCase().replace(/[_-]+/g,' ').replace(/\\s+/g,' ').trim();
+ const exact={
+  'bruise':'타박상','bruised':'타박상','contusion':'타박상','muscle bruise':'근육 타박상',
+  'calf strain':'종아리 근육 염좌','hamstring strain':'햄스트링 염좌','groin strain':'사타구니 근육 염좌',
+  'knee soreness':'무릎 통증','ankle sprain':'발목 염좌','sprained ankle':'발목 염좌',
+  'left ankle sprain':'왼쪽 발목 염좌','right ankle sprain':'오른쪽 발목 염좌',
+  'left knee soreness':'왼쪽 무릎 통증','right knee soreness':'오른쪽 무릎 통증',
+  'lower back pain':'허리 아래쪽 통증','back spasms':'허리 근육 경련',
+  'illness':'질병','not injury related':'부상 관련 없음','rest':'휴식','personal reasons':'개인 사유',
+  'return to competition reconditioning':'경기 복귀 체력 훈련','injury management':'부상 관리',
+  'foot injury':'발 부상','knee injury':'무릎 부상','ankle injury':'발목 부상','shoulder injury':'어깨 부상',
+  'hip injury':'엉덩이 부상','wrist injury':'손목 부상','hand injury':'손 부상','elbow injury':'팔꿈치 부상',
+  'fracture':'골절','torn acl':'전방십자인대 파열','acl tear':'전방십자인대 파열',
+  'achilles tear':'아킬레스건 파열','concussion':'뇌진탕','surgery':'수술','soreness':'통증',
+  'hamstring':'햄스트링 부상','strain':'근육 염좌','sprain':'염좌','bruise':'타박상',
+  'knee':'무릎 부상','illness':'질병','shoulder':'어깨 부상','ankle':'발목 부상',
+  'foot':'발 부상','back':'허리 부상','hip':'엉덩이 부상','wrist':'손목 부상',
+  'hand':'손 부상','elbow':'팔꿈치 부상','groin':'사타구니 부상','calf':'종아리 부상','thigh':'허벅지 부상'
+ };
+ if(exact[s])return exact[s];
+ // Preserve details while translating common anatomical and injury terms.
+ let out=s;
+ const replacements=[
+  [/left/g,'왼쪽'],[/right/g,'오른쪽'],[/bilateral/g,'양쪽'],
+  [/hamstring/g,'햄스트링'],[/quadriceps/g,'대퇴사두근'],[/calf/g,'종아리'],[/thigh/g,'허벅지'],
+  [/ankle/g,'발목'],[/knee/g,'무릎'],[/foot/g,'발'],[/toe/g,'발가락'],[/heel/g,'뒤꿈치'],
+  [/shoulder/g,'어깨'],[/elbow/g,'팔꿈치'],[/wrist/g,'손목'],[/hand/g,'손'],
+  [/hip/g,'엉덩이'],[/groin/g,'사타구니'],[/back/g,'허리'],[/neck/g,'목'],
+  [/muscle/g,'근육'],[/tendon/g,'힘줄'],[/ligament/g,'인대'],[/fracture/g,'골절'],[/tear/g,'파열'],
+  [/strain/g,'염좌'],[/sprain/g,'염좌'],[/bruise|contusion/g,'타박상'],[/soreness|pain/g,'통증'],
+  [/swelling/g,'부기'],[/inflammation/g,'염증'],[/illness/g,'질병'],[/surgery/g,'수술'],
+  [/injury/g,'부상'],[/questionable/g,'출전 불투명'],[/out/g,'결장'],[/day to day/g,'매일 상태 확인'],
+  [/not specified/g,'세부 정보 미제공']
+ ];
+ for(const [re,ko] of replacements)out=out.replace(re,ko);
+ out=out.replace(/\\b[a-z]+\\b/gi, w=>({ 'of':'','the':'','and':'및','with':'','in':'','to':'','a':'','an':'' }[w.toLowerCase()] ?? w));
+ return out===s ? raw : out.charAt(0).toUpperCase()+out.slice(1);
 }
 
-function injuryStatusText(s){let v=String(s||'상태 미제공').toLowerCase();if(/out|inactive|ruled out|결장/.test(v))return ['결장','tagred'];if(/question|doubt|game-time|day.to.day|불확실/.test(v))return ['출전 불투명','tagyellow'];if(/probable|available|active|출전 가능/.test(v))return ['출전 가능','taggreen'];return [s||'상태 미제공','']}
+function injuryStatusText(s){let raw=String(s||'상태 미제공'),v=raw.toLowerCase();if(/out|inactive|ruled out|결장/.test(v))return ['결장','tagred'];if(/question|doubt|game.time|day.to.day|불확실/.test(v))return ['출전 불투명','tagyellow'];if(/probable|available|active|출전 가능/.test(v))return ['출전 가능','taggreen'];const ko={'injured':'부상','questionable':'출전 불투명','doubtful':'출전 가능성 낮음','probable':'출전 가능성 높음','day-to-day':'매일 상태 확인','out':'결장','inactive':'출전 제외','suspended':'출장 정지','personal':'개인 사유'};return [ko[v]||raw,'']}
 
 const standingsCache={};
 async function teamRankLabel(m,teamName){
@@ -372,18 +415,51 @@ async function injuriesFor(m){
   $('injuryStamp').textContent=`선택 팀 필터 완료 · ${lists[0].length+lists[1].length}명`;
   const ranks=await Promise.all([teamRankLabel(m,m.home),teamRankLabel(m,m.away)]);
   $('injuries').querySelectorAll('.teaminj h3').forEach((h,i)=>{if(ranks[i]){const b=document.createElement('span');b.textContent=ranks[i];b.style.cssText='display:inline-block;margin-left:8px;padding:3px 7px;border-radius:8px;background:#223b59;color:#b9d9ff;font-size:11px';h.appendChild(b);}});
+  return selected.map((t,i)=>({team:t.name,players:lists[i]}));
  }catch(e){
   $('injuries').innerHTML=`<div class="empty">부상자 조회 오류: ${esc(e.message)}</div>`;
   $('injuryStamp').textContent='조회 오류';
+  return [{team:m.home,players:[]},{team:m.away,players:[]}];
  }
 }
-async function chooseMatch(m){if(!m)return;selected=m;applyFilter();$('analysisStatus').textContent='최근 경기 조회 중';$('matchMeta').textContent=`${m.league} · ${fmtTime(m.date)} · ${m.status}${m.venue?' · '+m.venue:''}`;$('homeIcon').innerHTML=m.homeLogo?`<img class="detail-logo" src="${esc(m.homeLogo)}" alt="${esc(names(m.home)[0])} 로고" onerror="this.style.display='none'">`:'<span class="logo-fallback">팀</span>';$('awayIcon').innerHTML=m.awayLogo?`<img class="detail-logo" src="${esc(m.awayLogo)}" alt="${esc(names(m.away)[0])} 로고" onerror="this.style.display='none'">`:'<span class="logo-fallback">팀</span>';$('homeKo').textContent=names(m.home)[0];$('awayKo').textContent=names(m.away)[0];$('homeEn').textContent=names(m.home)[1];$('awayEn').textContent=names(m.away)[1];$('detailContent').innerHTML='<div class="empty">양 팀 최근 경기 기록을 불러오는 중…</div>';addForm('homeForm',[],m.home);addForm('awayForm',[],m.away);$('summary').innerHTML='<li><span class="dot">●</span>실제 최근 경기 데이터 조회 중</li>';injuriesFor(m);try{const [h,a]=await Promise.all([recentGames(m.home),recentGames(m.away)]);if(selected?.id!==m.id)return;const hs=stats(m.home,h),as=stats(m.away,a);addForm('homeForm',h,m.home);addForm('awayForm',a,m.away);let valid=hs.n>=2&&as.n>=2;let expectedH=(hs.for+as.against)/2,expectedA=(as.for+hs.against)/2,total=expectedH+expectedA;let diff=(hs.margin-as.margin)/(sport==='basketball'?14:sport==='baseball'?4:1.8)+(hs.w/Math.max(1,hs.n)-as.w/Math.max(1,as.n))*1.2;let prob=Math.round(Math.max(8,Math.min(92,50+diff*12+(sport==='soccer'?2:4))));let scoreText=m.hasScore?`${m.hs} : ${m.as}`:valid?`${expectedH.toFixed(1)} : ${expectedA.toFixed(1)}`:'표본 부족';$('detailContent').innerHTML=`
+async function chooseMatch(m){if(!m)return;selected=m;applyFilter();$('analysisStatus').textContent='최근 경기 조회 중';$('matchMeta').textContent=`${m.league} · ${fmtTime(m.date)} · ${m.status}${m.venue?' · '+m.venue:''}`;$('homeIcon').innerHTML=m.homeLogo?`<img class="detail-logo" src="${esc(m.homeLogo)}" alt="${esc(names(m.home)[0])} 로고" onerror="this.style.display='none'">`:'<span class="logo-fallback">팀</span>';$('awayIcon').innerHTML=m.awayLogo?`<img class="detail-logo" src="${esc(m.awayLogo)}" alt="${esc(names(m.away)[0])} 로고" onerror="this.style.display='none'">`:'<span class="logo-fallback">팀</span>';$('homeKo').textContent=names(m.home)[0];$('awayKo').textContent=names(m.away)[0];$('homeEn').textContent=names(m.home)[1];$('awayEn').textContent=names(m.away)[1];$('detailContent').innerHTML='<div class="empty">양 팀 최근 경기 기록을 불러오는 중…</div>';addForm('homeForm',[],m.home);addForm('awayForm',[],m.away);$('summary').innerHTML='<li><span class="dot">●</span>실제 최근 경기 데이터 조회 중</li>';const injuryPromise=injuriesFor(m);try{const [h,a,injuryTeams]=await Promise.all([recentGames(m.home),recentGames(m.away),injuryPromise]);if(selected?.id!==m.id)return;const hs=stats(m.home,h),as=stats(m.away,a);addForm('homeForm',h,m.home);addForm('awayForm',a,m.away);let valid=hs.n>=2&&as.n>=2;let expectedH=(hs.for+as.against)/2,expectedA=(as.for+hs.against)/2,total=expectedH+expectedA;let diff=(hs.margin-as.margin)/(sport==='basketball'?14:sport==='baseball'?4:1.8)+(hs.w/Math.max(1,hs.n)-as.w/Math.max(1,as.n))*1.2;let probBase=Math.round(Math.max(8,Math.min(92,50+diff*12+(sport==='soccer'?2:4))));
+  const injuryImpact=(injuryTeams||[]).map(t=>{
+   const players=t.players||[];
+   let impact=0, notes=[];
+   for(const p of players){
+    const st=String(p.status||'').toLowerCase();
+    const out=/out|inactive|ruled out|결장/.test(st);
+    const uncertain=/question|doubt|game.time|day.to.day|불확실|questionable|probable/.test(st);
+    if(!out&&!uncertain)continue;
+    const name=String(p.name||'').toLowerCase().replace(/[.'’]/g,'').replace(/\\s+/g,' ').trim();
+    const elite=/nikola jokic|shai gilgeous|giannis antetokounmpo|luka doncic|stephen curry|lebron james|jayson tatum|anthony edwards|joel embiid|victor wembanyama|kevin durant|donovan mitchell|ja morant|zion williamson|tyrese haliburton|trae young|jalen brunson|paolo banchero|lamelo ball|damian lillard|kawhi leonard/.test(name);
+    const starter=/jusuf nurkic|lauri markkanen|brandon ingram|cj mccollum|zion williamson|herbert jones|trey murphy|collin sexton|john collins|keyonte george|walker kessler|jordan clarkson|desmond bane|jaren jackson|chet holmgren|jamal murray|aaron gordon|kyrie irving|khris middleton|bam adebayo|tyrese maxey|scottie barnes|evan mobley|jarrett allen|devin booker|bradley beal|jalen williams|chet holmgren/.test(name);
+    const role=elite?1.0:starter?0.55:0.18;
+    const certainty=out?1:0.45;
+    const points=(sport==='basketball'?role*certainty:role*certainty*0.5);
+    impact+=points;
+    if(role>=0.55)notes.push(`${playerKo(p.name)} ${out?'결장':'출전 불투명'} · 핵심 전력 영향`);
+    else notes.push(`${playerKo(p.name)} ${out?'결장':'출전 불투명'} · 영향 제한적으로 반영`);
+   }
+   return {team:t.team,impact:Math.min(1.5,impact),notes,players:players.length};
+  });
+  let injuryDelta=0;
+  if(sport==='basketball'&&injuryImpact.length>=2)injuryDelta=(injuryImpact[1].impact-injuryImpact[0].impact)*5.5;
+  let prob=Math.round(Math.max(5,Math.min(95,probBase+injuryDelta)));
+  if(sport==='basketball'&&valid&&injuryImpact.length>=2){
+   expectedH=Math.max(70,expectedH-injuryImpact[0].impact*3.2+injuryImpact[1].impact*1.2);
+   expectedA=Math.max(70,expectedA-injuryImpact[1].impact*3.2+injuryImpact[0].impact*1.2);
+   total=expectedH+expectedA;
+  }
+  let scoreText=m.hasScore?`${m.hs} : ${m.as}`:valid?`${expectedH.toFixed(1)} : ${expectedA.toFixed(1)}`:'표본 부족';$('detailContent').innerHTML=`
+<div class="compare" style="border-color:#304b68"><h3>🩹 부상 영향 반영</h3><div class="minor">기본 승리 확률 ${probBase}% → 부상 반영 ${prob}%</div><div class="minor" style="margin-top:6px">부상 반영 예상 점수: <b class="gold">${valid?expectedH.toFixed(1)+' : '+expectedA.toFixed(1):'표본 부족'}</b></div><div class="minor" style="margin-top:8px">${(injuryImpact||[]).map(t=>`${esc(names(t.team)[0])}: ${t.notes.length?t.notes.map(esc).join(', '):'확인된 핵심 결장/출전 불투명 선수 없음'}`).join('<br>')}</div><div class="minor" style="margin-top:8px">핵심 선수 결장은 크게, 주전급은 중간 정도, 그 외 선수는 제한적으로 반영합니다. 출전 불투명은 결장보다 낮은 가중치를 적용합니다. 선수 역할 데이터가 완전하지 않아 영향도는 보수적 추정입니다.</div></div>
 <div class="statsgrid"><div class="statcard"><span>${esc(names(m.home)[0])} 승리 추정</span><b class="green">${valid?prob+'%':'—'}</b><div class="bar"><i style="width:${valid?prob:50}%"></i></div></div><div class="statcard"><span>${esc(names(m.away)[0])} 승리 추정</span><b class="blue">${valid?(100-prob)+'%':'—'}</b><div class="bar away"><i style="width:${valid?100-prob:50}%"></i></div></div></div>
 <div class="compare"><h3>주요 지표 비교 · 최근 완료 경기</h3>${[['평균 득점',hs.for,as.for],['평균 실점',hs.against,as.against],['승리',hs.w,as.w],['득실 차',hs.margin,as.margin]].map(([label,x,y])=>{let max=Math.max(Math.abs(x),Math.abs(y),1);return `<div class="barrow"><b>${Number(x).toFixed(1)}</b><div class="bar"><i style="width:${Math.abs(x)/max*100}%"></i></div><span class="barlabel">${label}</span><div class="bar away"><i style="width:${Math.abs(y)/max*100}%"></i></div><b style="text-align:right">${Number(y).toFixed(1)}</b></div>`}).join('')}</div>
 <div class="compare"><h3>최근 경기 표본 및 흐름</h3><div class="minor">${esc(names(m.home)[0])}: ${hs.n}경기 · ${hs.w}승 ${hs.d}무 ${hs.l}패 · 평균 득점 ${hs.for.toFixed(1)} / 실점 ${hs.against.toFixed(1)} · 득실 차 ${hs.margin>=0?'+':''}${hs.margin.toFixed(1)}</div><div class="minor" style="margin-top:7px">${esc(names(m.away)[0])}: ${as.n}경기 · ${as.w}승 ${as.d}무 ${as.l}패 · 평균 득점 ${as.for.toFixed(1)} / 실점 ${as.against.toFixed(1)} · 득실 차 ${as.margin>=0?'+':''}${as.margin.toFixed(1)}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"><div><b style="font-size:11px">${esc(names(m.home)[0])} 최근 완료 경기</b>${h.length?h.slice(0,5).map(g=>`<div class="minor" style="padding:7px 0;border-bottom:1px solid #203249">${esc(fmtTime(g.date))}<br><b style="color:${(g.home===m.home?g.hs>g.as:g.as>g.hs)?'#50e0ad':(g.home===m.home?g.hs<g.as:g.as<g.hs)?'#ff6b82':'#d3deec'}">${esc(names(g.home)[0])} ${g.hs}:${g.as} ${esc(names(g.away)[0])}</b></div>`).join(''):'<div class="minor">최근 경기 기록을 확인하지 못했습니다.</div>'}</div><div><b style="font-size:11px">${esc(names(m.away)[0])} 최근 완료 경기</b>${a.length?a.slice(0,5).map(g=>`<div class="minor" style="padding:7px 0;border-bottom:1px solid #203249">${esc(fmtTime(g.date))}<br><b style="color:${(g.home===m.away?g.hs>g.as:g.as>g.hs)?'#50e0ad':(g.home===m.away?g.hs<g.as:g.as<g.hs)?'#ff6b82':'#d3deec'}">${esc(names(g.home)[0])} ${g.hs}:${g.as} ${esc(names(g.away)[0])}</b></div>`).join(''):'<div class="minor">최근 경기 기록을 확인하지 못했습니다.</div>'}</div></div></div>
 <div class="compare"><h3>언더 / 오버 기준점</h3><div class="minor" style="margin-bottom:8px">예상 점수 / 골 <b class="gold">${valid?expectedH.toFixed(1)+' : '+expectedA.toFixed(1):'산출 불가'}</b> <span style="margin-left:6px">${m.hasScore?(m.done?'실제 최종 점수와 별도 추정':'현재 점수와 별도 추정'):'최근 득실 평균 기반'}</span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label class="minor">언오버</label><input id="totalLine" class="control" style="width:90px" type="number" step=".5" value="${sport==='soccer'?'2.5':sport==='baseball'?'8.5':'220.5'}"><button class="miniBtn" id="calcTotal">합계 비교</button><b id="totalResult" class="gold">—</b></div><div class="minor" style="margin-top:10px">예상 합계 ${valid?total.toFixed(1):'산출 불가'}</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:12px"><div style="border:1px solid #263b52;border-radius:10px;padding:10px"><div class="minor" style="margin-bottom:7px">홈팀 마이너스 핸디캡 (-)</div><div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap"><span class="minor">홈팀 -</span><input id="handicapMinusLine" class="control" style="width:78px" type="number" min="0" step=".5" value="${sport==='soccer'?'0.5':sport==='baseball'?'1.5':'3.5'}"><button class="miniBtn" id="calcHandicapMinus">비교</button></div><b id="handicapMinusResult" class="gold" style="display:block;margin-top:8px">—</b></div><div style="border:1px solid #263b52;border-radius:10px;padding:10px"><div class="minor" style="margin-bottom:7px">홈팀 플러스 핸디캡 (+)</div><div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap"><span class="minor">홈팀 +</span><input id="handicapPlusLine" class="control" style="width:78px" type="number" min="0" step=".5" value="${sport==='soccer'?'0.5':sport==='baseball'?'1.5':'3.5'}"><button class="miniBtn" id="calcHandicapPlus">비교</button></div><b id="handicapPlusResult" class="gold" style="display:block;margin-top:8px">—</b></div></div><div class="minor" style="margin-top:8px">예상 점수 차 (홈 - 원정): ${valid?(expectedH-expectedA>=0?'+':'')+(expectedH-expectedA).toFixed(1):'산출 불가'} · 마이너스는 홈팀이 해당 점수 차 이상 이겨야 유리하고, 플러스는 홈팀 예상 점수에 핸디캡을 더해 비교합니다. 예상치는 최근 득실 평균 기반이며 확정 예측이 아닙니다.</div></div>
 <div class="minor" style="padding:10px 0">${valid?'최근 완료 경기의 평균 득점·실점과 단순 홈 이점으로 계산했습니다. 검증된 머신러닝 승률이 아닙니다.':'최근 경기 표본이 부족하여 승리 확률을 표시하지 않았습니다.'} ${m.hasScore?'실제 점수와 사전 추정은 별개입니다.':''}</div>`;
-$('calcTotal').onclick=()=>{let line=Number($('totalLine').value);$('totalResult').textContent=!valid?'표본 부족':total>line?'오버 쪽':total<line?'언더 쪽':'기준점과 동일'};const handicapText=adjusted=>!valid?'표본 부족':adjusted>0?'핸디캡 적용 후 홈팀 우세':adjusted<0?'핸디캡 적용 후 원정팀 우세':'핸디캡 적용 후 동률';$('calcHandicapMinus').onclick=()=>{let line=Math.abs(Number($('handicapMinusLine').value));let margin=expectedH-expectedA;$('handicapMinusResult').textContent=handicapText(margin-line)};$('calcHandicapPlus').onclick=()=>{let line=Math.abs(Number($('handicapPlusLine').value));let margin=expectedH-expectedA;$('handicapPlusResult').textContent=handicapText(margin+line)};$('analysisStatus').textContent=valid?'최근 폼 기반 추정':'표본 부족';const marginGap=hs.margin-as.margin;const winRateH=hs.n?hs.w/hs.n:0,winRateA=as.n?as.w/as.n:0;const reasons=valid?[`${names(m.home)[0]} 최근 ${hs.n}경기 ${hs.w}승 ${hs.d}무 ${hs.l}패 · 평균 득실차 ${hs.margin>=0?'+':''}${hs.margin.toFixed(1)}`,`${names(m.away)[0]} 최근 ${as.n}경기 ${as.w}승 ${as.d}무 ${as.l}패 · 평균 득실차 ${as.margin>=0?'+':''}${as.margin.toFixed(1)}`,`폼 비교: 최근 승률 ${Math.round(winRateH*100)}% 대 ${Math.round(winRateA*100)}% · 득실차 격차 ${marginGap>=0?'+':''}${marginGap.toFixed(1)}`,`예상 점수 근거: 각 팀 평균 득점과 상대 평균 실점을 조합해 산출 (${expectedH.toFixed(1)} : ${expectedA.toFixed(1)})`,`판단: ${prob>54?names(m.home)[0]+' 쪽 우세':prob<46?names(m.away)[0]+' 쪽 우세':'전력 차이가 작아 접전 예상'} · 단순 통계 추정이며 확정 예측 아님`]:[`최근 경기 표본 부족: 홈팀 ${hs.n}경기 / 원정팀 ${as.n}경기`,`양 팀 모두 최소 2경기 이상 데이터가 확보되지 않아 신뢰도 있는 승률·예상 점수를 산출하지 않음`,'부상·출전 정보는 실제 공개 피드에서 확인되는 경우에만 반영'];reasons.push('신뢰도 안내: 최근 경기 표본과 공개 데이터에 기반한 통계 요약이며, 실시간 배당·라인업·부상 소식 전체를 반영한 전문 AI 모델은 아님');$('summary').innerHTML=reasons.map((t,i)=>`<li><span class="dot">${i===4&&valid?'◆':'●'}</span>${esc(t)}</li>`).join('')}catch(e){$('detailContent').innerHTML=`<div class="empty">분석 데이터 조회 실패: ${esc(e.message)}</div>`;$('analysisStatus').textContent='분석 실패'}}
+$('calcTotal').onclick=()=>{let line=Number($('totalLine').value);$('totalResult').textContent=!valid?'표본 부족':total>line?'오버 쪽':total<line?'언더 쪽':'기준점과 동일'};const handicapText=adjusted=>!valid?'표본 부족':adjusted>0?'핸디캡 적용 후 홈팀 우세':adjusted<0?'핸디캡 적용 후 원정팀 우세':'핸디캡 적용 후 동률';$('calcHandicapMinus').onclick=()=>{let line=Math.abs(Number($('handicapMinusLine').value));let margin=expectedH-expectedA;$('handicapMinusResult').textContent=handicapText(margin-line)};$('calcHandicapPlus').onclick=()=>{let line=Math.abs(Number($('handicapPlusLine').value));let margin=expectedH-expectedA;$('handicapPlusResult').textContent=handicapText(margin+line)};$('analysisStatus').textContent=valid?'최근 폼 기반 추정':'표본 부족';const marginGap=hs.margin-as.margin;const winRateH=hs.n?hs.w/hs.n:0,winRateA=as.n?as.w/as.n:0;const reasons=valid?[`${names(m.home)[0]} 최근 ${hs.n}경기 ${hs.w}승 ${hs.d}무 ${hs.l}패 · 평균 득실차 ${hs.margin>=0?'+':''}${hs.margin.toFixed(1)}`,`${names(m.away)[0]} 최근 ${as.n}경기 ${as.w}승 ${as.d}무 ${as.l}패 · 평균 득실차 ${as.margin>=0?'+':''}${as.margin.toFixed(1)}`,`폼 비교: 최근 승률 ${Math.round(winRateH*100)}% 대 ${Math.round(winRateA*100)}% · 득실차 격차 ${marginGap>=0?'+':''}${marginGap.toFixed(1)}`,`예상 점수 근거: 각 팀 평균 득점과 상대 평균 실점을 조합해 산출 (${expectedH.toFixed(1)} : ${expectedA.toFixed(1)})`,`판단: ${prob>54?names(m.home)[0]+' 쪽 우세':prob<46?names(m.away)[0]+' 쪽 우세':'전력 차이가 작아 접전 예상'} · 부상 반영 확률 ${prob}% · 단순 통계 추정이며 확정 예측 아님`,
+  `부상 영향: ${(injuryImpact||[]).map(t=>names(t.team)[0]+' '+(t.impact>0.7?'핵심 전력 이탈 영향 큼':t.impact>0?'일부 전력 영향':'확인된 영향 없음')).join(' / ')}`]:[`최근 경기 표본 부족: 홈팀 ${hs.n}경기 / 원정팀 ${as.n}경기`,`양 팀 모두 최소 2경기 이상 데이터가 확보되지 않아 신뢰도 있는 승률·예상 점수를 산출하지 않음`,'부상·출전 정보는 실제 공개 피드에서 확인되는 경우에만 반영'];reasons.push('신뢰도 안내: 최근 경기 표본과 공개 데이터에 기반한 통계 요약이며, 실시간 배당·라인업·부상 소식 전체를 반영한 전문 AI 모델은 아님');$('summary').innerHTML=reasons.map((t,i)=>`<li><span class="dot">${i===4&&valid?'◆':'●'}</span>${esc(t)}</li>`).join('')}catch(e){$('detailContent').innerHTML=`<div class="empty">분석 데이터 조회 실패: ${esc(e.message)}</div>`;$('analysisStatus').textContent='분석 실패'}}
 document.querySelectorAll('.sport').forEach(b=>b.onclick=()=>{sport=b.dataset.sport;league=LEAGUES[sport][0];document.querySelectorAll('.sport').forEach(x=>x.classList.toggle('active',x===b));renderLeagues();loadGames()});
 document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));applyFilter()});
 $('date').value=ymd(new Date());$('date').onchange=()=>{renderDays();loadGames()};$('loadBtn').onclick=loadGames;$('refresh').onclick=()=>{cache.clear();loadGames()};$('featured').onclick=()=>{featured=!featured;$('featured').style.borderColor=featured?'#0878ff':'#2a3c53';$('importantOnly').checked=featured;applyFilter()};$('importantOnly').onchange=e=>{featured=e.target.checked;applyFilter()};$('live').onclick=()=>{filter='live';document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x.dataset.filter==='live'));loadGames()};document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-detail]').forEach(x=>x.classList.toggle('active',x===b));if(!selected)return;if(b.dataset.detail==='injury')$('injuries').scrollIntoView({behavior:'smooth',block:'center'});else if(b.dataset.detail==='form')$('detailContent').scrollIntoView({behavior:'smooth',block:'center'});else $('detailContent').scrollIntoView({behavior:'smooth',block:'start'})});
