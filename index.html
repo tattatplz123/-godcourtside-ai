@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080f1a">
-<title>COURTSIDE AI V24 — Sports Broadcast UI</title>
+<title>COURTSIDE AI V25 — Sports Broadcast UI</title>
 <style>
 :root{--bg:#070e17;--panel:#0d1825;--panel2:#111f30;--line:#23354a;--muted:#9aaabd;--text:#f4f7fb;--blue:#0878ff;--blue2:#0e5ce6;--green:#00d28b;--red:#ff3659;--gold:#f6c84e}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 48% -20%,#1b3450 0,#080f1a 54%);color:var(--text);font:14px/1.4 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #61a7ff;outline-offset:2px}
@@ -92,7 +92,7 @@ a{color:#8fc4ff}
 </head>
 <body>
 <header class="top">
- <div class="brand">COURTSIDE AI <span class="version">V24</span><small>SPORTS ANALYSIS PLATFORM</small></div>
+ <div class="brand">COURTSIDE AI <span class="version">V25</span><small>SPORTS ANALYSIS PLATFORM</small></div>
  <div class="sporttabs"><button class="sport active" data-sport="basketball">🏀 농구</button><button class="sport" data-sport="soccer">⚽ 축구</button><button class="sport" data-sport="baseball">⚾ 야구</button></div>
  <div class="topright"><button class="control" id="featured">♛ 주요 경기만</button><input class="control" type="date" id="date" aria-label="조회 날짜"><button class="control livepill" id="live">◉ 실시간</button><button class="control iconbtn" id="refresh" title="새로고침">⟳</button></div>
 </header>
@@ -117,7 +117,7 @@ a{color:#8fc4ff}
   <section class="panel"><div class="panelhead"><h2>AI 분석 요약</h2><span class="minor">근거 기반</span></div><ul class="summarylist" id="summary"><li><span class="dot">●</span>경기를 선택하면 양 팀 최근 흐름과 데이터 상태를 요약합니다.</li></ul></section>
  </aside>
 </div>
-<footer class="foot">COURTSIDE AI V24 · ESPN 공개 피드 기반 · 부상자 데이터는 리그별 제공 여부가 다릅니다 · 예측은 참고 정보이며 결과를 보장하지 않습니다.</footer>
+<footer class="foot">COURTSIDE AI V20 · ESPN 공개 피드 기반 · 부상자 데이터는 리그별 제공 여부가 다릅니다 · 예측은 참고 정보이며 결과를 보장하지 않습니다.</footer>
 <script>
 const LEAGUES={
  basketball:[{id:'nba',label:'NBA',en:'NBA',emoji:'🏀',path:'basketball/nba',important:true},{id:'euro',label:'유로리그',en:'EuroLeague',emoji:'🏀',path:'basketball/euro-league',important:true},{id:'kbl',label:'KBL',en:'Korean Basketball League',emoji:'🏀',path:'basketball/korea-basketball-league',important:true}],
@@ -153,7 +153,7 @@ function renderLeagues(){let html='';for(const [key,list] of Object.entries(LEAG
 function normalizeEvent(ev){const comp=ev.competitions?.[0];if(!comp)return null;const competitors=comp.competitors||[];const h=competitors.find(c=>c.homeAway==='home')||competitors[0],a=competitors.find(c=>c.homeAway==='away')||competitors[1];if(!h||!a)return null;const status=ev.status?.type||{};const state=status.state||'pre';const home=h.team?.displayName||h.team?.name||'Home';const away=a.team?.displayName||a.team?.name||'Away';return {id:ev.id||`${home}-${away}-${ev.date}`,home,away,homeTeamId:h.team?.id||'',awayTeamId:a.team?.id||'',homeLogo:h.team?.logo||h.team?.logos?.[0]?.href||'',awayLogo:a.team?.logo||a.team?.logos?.[0]?.href||'',date:ev.date||new Date().toISOString(),status:state==='in'?'실시간':state==='post'?'종료':'예정',state,live:state==='in',done:state==='post',hasScore:h.score!=null&&a.score!=null,hs:Number(h.score),as:Number(a.score),league:league.label,path:league.path,emoji:league.emoji,venue:comp.venue?.fullName||'',broadcast:comp.broadcasts?.[0]?.names?.join(', ')||'',raw:ev}}
 async function loadGames(){
 matches=[];selected=null;$('matches').innerHTML='<div class="empty">실제 경기 일정을 불러오는 중…</div>';$('scheduleState').textContent=`${league.label} · ${$('date').value} · 데이터 조회 중`;$('count').textContent='조회 중';renderDays();
-if(!league.path){$('matches').innerHTML=`<div class="empty"><b>${league.label} 자동 일정 피드가 연결되어 있지 않습니다.</b><br>ESPN 공개 API에서 이 리그 일정을 제공하지 않아 자동 경기 목록을 불러올 수 없습니다. 공식 일정 링크로 확인해 주세요.<br><br><a href="${league.id==='kbo'?'https://eng.koreabaseball.com/Schedule/DailySchedule.aspx':'https://npb.jp/games/'}" target="_blank" rel="noopener" style="color:#77b6ff">공식 일정 열기 ↗</a></div>`;$('scheduleState').textContent='공식 일정 링크 제공 · 자동 피드 미연결';$('count').textContent='외부 피드 미연결';return}
+if(!league.path){$('matches').innerHTML=`<div class="empty"><b>${league.label} 자동 일정 피드가 연결되어 있지 않습니다.</b><br>공식 일정에서 실제 경기를 확인해 주세요.<br><br><a href="${league.id==='kbo'?'https://eng.koreabaseball.com/Schedule/DailySchedule.aspx':'https://npb.jp/games/'}" target="_blank" rel="noopener" style="color:#77b6ff">공식 일정 열기 ↗</a></div>`;$('scheduleState').textContent='공식 일정 링크 제공 · 자동 피드 미연결';$('count').textContent='외부 피드 미연결';return}
 const day=$('date').value||ymd(new Date());const key=league.path+'|KST|'+day;
 try{
  let data=cache.get(key);
@@ -186,60 +186,69 @@ async function recentGames(team){const key=league.path+'|form|'+team;if(cache.ha
 function stats(team,rows){let w=0,l=0,d=0,sc=0,ag=0,n=0;for(const m of rows){const home=m.home===team, f=home?m.hs:m.as,a=home?m.as:m.hs;if(!Number.isFinite(f)||!Number.isFinite(a))continue;n++;sc+=f;ag+=a;if(f>a)w++;else if(f<a)l++;else d++}return {n,w,l,d,for:n?sc/n:0,against:n?ag/n:0,margin:n?(sc-ag)/n:0}}
 function injuryStatusText(s){let v=String(s||'상태 미제공').toLowerCase();if(/out|inactive|ruled out|결장/.test(v))return ['결장','tagred'];if(/question|doubt|game-time|day.to.day|불확실/.test(v))return ['출전 불투명','tagyellow'];if(/probable|available|active|출전 가능/.test(v))return ['출전 가능','taggreen'];return [s||'상태 미제공','']}
 async function injuriesFor(m){
- $('injuryStamp').textContent='실제 피드 확인 중';
- $('injuries').innerHTML='<div class="empty">양 팀의 부상자 정보를 조회하는 중…</div>';
- if(!m.path){$('injuries').innerHTML='<div class="empty">이 리그의 자동 부상자 피드가 연결되지 않았습니다. 결장자가 없다는 뜻은 아닙니다.</div>';return}
+ $('injuryStamp').textContent='초기 방식으로 부상자 피드 확인 중';
+ $('injuries').innerHTML='<div class="empty">부상자 정보를 조회하는 중…</div>';
+ if(!m || !m.path){
+  $('injuries').innerHTML='<div class="empty">이 리그의 부상자 피드 경로가 없습니다. 부상자가 없다는 뜻은 아닙니다.</div>';
+  $('injuryStamp').textContent='피드 경로 없음'; return;
+ }
  try{
-  const requests=[];
-  if(m.homeTeamId)requests.push({scope:m.home,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.homeTeamId}/injuries`});
-  if(m.awayTeamId)requests.push({scope:m.away,url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/teams/${m.awayTeamId}/injuries`});
-  requests.push({scope:'',url:`https://site.api.espn.com/apis/site/v2/sports/${m.path}/injuries`});
-  requests.push({scope:'',url:`https://site.web.api.espn.com/apis/site/v2/sports/${m.path}/injuries`});
-  const responses=await Promise.all(requests.map(async q=>{try{const r=await fetch(q.url,{cache:'no-store'});if(!r.ok)return {scope:q.scope,ok:false,url:q.url,status:r.status};return {scope:q.scope,ok:true,data:await r.json(),url:q.url,status:r.status}}catch(e){return {scope:q.scope,ok:false,url:q.url,error:String(e)}}}));
-  const arr=[],seen=new Set();
-  const textVal=v=>typeof v==='string'||typeof v==='number'?String(v):'';
-  function addPlayer(athlete,injury,team,scope){
-   if(!athlete||typeof athlete!=='object')return;
-   const name=athlete.displayName||athlete.fullName||athlete.name||athlete.shortName||athlete.athlete?.displayName||'';
-   if(!name)return;
-   const statusObj=injury?.status||injury?.injuryStatus||injury?.availability||athlete.status;
-   const status=(typeof statusObj==='object'?(statusObj.type?.description||statusObj.type?.name||statusObj.name||statusObj.description||statusObj.abbreviation):textVal(statusObj))||injury?.type?.description||injury?.type?.name||injury?.statusText||'상태 미제공';
-   const detail=injury?.details?.detail||injury?.details?.type||injury?.detail||injury?.description||injury?.location||injury?.type?.description||injury?.type?.name||injury?.injury?.description||injury?.notes||'';
-   const teamName=typeof team==='string'?team:(team?.displayName||team?.name||team?.shortDisplayName||team?.abbreviation||'');
-   const key=[name,teamName||scope,status,detail].join('|').toLowerCase();
-   if(!seen.has(key)){seen.add(key);arr.push({name,team:teamName,sourceTeam:scope,status:String(status),detail:String(detail||'')})}
+  const urls=[
+   `https://site.api.espn.com/apis/site/v2/sports/${m.path}/injuries`,
+   `https://site.web.api.espn.com/apis/site/v2/sports/${m.path}/injuries`
+  ];
+  const results=await Promise.all(urls.map(async url=>{
+   try{const r=await fetch(url,{cache:'no-store'});if(!r.ok)return {ok:false,url,status:r.status};return {ok:true,url,data:await r.json()}}
+   catch(e){return {ok:false,url,error:String(e)}}
+  }));
+  const rows=[],seen=new Set();
+  const str=v=>typeof v==='string'||typeof v==='number'?String(v):'';
+  function walk(o,inheritedTeam=''){
+   if(!o||typeof o!=='object')return;
+   if(Array.isArray(o)){o.forEach(v=>walk(v,inheritedTeam));return}
+   const teamObj=o.team||o.teamInfo||inheritedTeam||'';
+   const team=typeof teamObj==='string'?teamObj:(teamObj.displayName||teamObj.name||teamObj.shortDisplayName||teamObj.abbreviation||'');
+   const athlete=o.athlete||o.player||o.participant?.athlete;
+   if(athlete&&typeof athlete==='object'){
+    const name=athlete.displayName||athlete.fullName||athlete.name||athlete.shortName||'';
+    const injury=o.injury||o.injuries?.[0]||o;
+    const statusObj=injury.status||injury.injuryStatus||injury.availability||athlete.status||injury.type;
+    const status=(typeof statusObj==='object'?(statusObj.type?.description||statusObj.type?.name||statusObj.description||statusObj.name||statusObj.abbreviation):str(statusObj))||'상태 미제공';
+    const detail=injury.details?.detail||injury.details?.type||injury.detail||injury.description||injury.location||injury.type?.description||injury.type?.name||injury.notes||'';
+    if(name&&(o.status||o.type||o.details||o.injury||o.injuries||o.injuryStatus||o.availability||o.location||o.description)){
+     const key=[name,team,status,detail].join('|').toLowerCase();
+     if(!seen.has(key)){seen.add(key);rows.push({name,team,status:String(status),detail:String(detail||'')})}
+    }
+   }
+   for(const [k,v] of Object.entries(o)) if(v&&typeof v==='object') walk(v,team||inheritedTeam);
   }
-  function walk(x,scope='',inheritedTeam=''){
-   if(!x||typeof x!=='object')return;
-   if(Array.isArray(x)){x.forEach(v=>walk(v,scope,inheritedTeam));return}
-   const team=x.team||x.teamName||x.teamDisplayName||inheritedTeam||'';
-   const athlete=x.athlete||x.player||x.participant?.athlete||x.athleteInfo||null;
-   const hasInjuryFields=!!(x.status||x.type||x.details||x.injuryStatus||x.injury||x.location||x.date||x.availability||x.shortComment||x.longComment||x.comment||x.description);
-   if(athlete&&hasInjuryFields)addPlayer(athlete,x.injury&&typeof x.injury==='object'?{...x,...x.injury}:x,team,scope);
-   if(athlete&&Array.isArray(x.injuries))x.injuries.forEach(inj=>addPlayer(athlete,inj,team,scope));
-   // ESPN often places an athlete object inside an injury object or wraps rows in items/entries.
-   if(x.athlete&&typeof x.athlete==='object'&&x.injury&&typeof x.injury==='object')addPlayer(x.athlete,{...x,...x.injury},team,scope);
-   Object.entries(x).forEach(([k,v])=>{if(v&&typeof v==='object')walk(v,scope,team)});
+  results.filter(x=>x.ok).forEach(x=>walk(x.data));
+  const norm=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9가-힣]/g,'');
+  const homeNames=[m.home,...(typeof names==='function'?names(m.home):[])].map(norm).filter(Boolean);
+  const awayNames=[m.away,...(typeof names==='function'?names(m.away):[])].map(norm).filter(Boolean);
+  function belongs(row,team,keys){
+   if(!row.team)return false;
+   const t=norm(row.team);
+   return keys.some(k=>k&&(k===t||k.includes(t)||t.includes(k)));
   }
-  responses.filter(r=>r.ok).forEach(r=>walk(r.data,r.scope,''));
-  const norm=v=>String(v||'').toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9가-힣]/g,'');
-  const homeKeys=[m.home,names(m.home)[0],names(m.home)[1]].map(norm).filter(Boolean);
-  const awayKeys=[m.away,names(m.away)[0],names(m.away)[1]].map(norm).filter(Boolean);
-  const teamRows=(team,keys)=>arr.filter(x=>{
-   if(x.sourceTeam&&x.sourceTeam===team)return true;
-   if(!x.team)return false;
-   const t=norm(x.team);return keys.some(k=>k===t||k.includes(t)||t.includes(k));
-  });
-  const homeRows=teamRows(m.home,homeKeys),awayRows=teamRows(m.away,awayKeys);
-  if(!homeRows.length&&!awayRows.length){
-   const okCount=responses.filter(r=>r.ok).length,failed=okCount===0;
-   $('injuries').innerHTML=`<div class="empty"><b>${failed?'부상자 데이터 제공처에 연결하지 못했습니다.':'피드 응답은 받았지만 선수별 부상 항목을 확인하지 못했습니다.'}</b><br>${failed?'해당 리그 피드 미지원 또는 연결 오류입니다.':'응답에 부상자 목록이 없거나 ESPN이 해당 리그 부상자 정보를 공개하지 않을 수 있습니다.'}<br><br><span class="minor">${okCount}/${responses.length}개 피드 응답 성공 · 선수 데이터 ${arr.length}건 파싱 · 팀별 항목 ${homeRows.length}/${awayRows.length}</span><br><span class="minor">부상자 정보 미제공은 부상자가 없다는 뜻이 아닙니다.</span></div>`;
-   $('injuryStamp').textContent=failed?'피드 연결 실패':'선수 항목 확인 안 됨';return;
+  const homeRows=rows.filter(x=>belongs(x,m.home,homeNames));
+  const awayRows=rows.filter(x=>belongs(x,m.away,awayNames));
+  const anyRows=rows.filter(x=>!x.team);
+  // Some older ESPN feeds omit team metadata; show those rows rather than falsely reporting no data.
+  const displayHome=homeRows.length?homeRows:(rows.length&&!awayRows.length?anyRows:[]);
+  const displayAway=awayRows.length?awayRows:[];
+  if(!displayHome.length&&!displayAway.length){
+   const ok=results.filter(x=>x.ok).length;
+   $('injuries').innerHTML=`<div class="empty"><b>${ok?'피드는 응답했지만 선수별 부상 항목이 확인되지 않았습니다.':'부상자 피드 연결에 실패했습니다.'}</b><br><span class="minor">${ok}/${results.length}개 리그 피드 응답 성공 · ${rows.length}건 파싱</span><br><span class="minor">정보 미제공은 부상자가 없다는 뜻이 아닙니다.</span></div>`;
+   $('injuryStamp').textContent=ok?'선수 항목 없음':'피드 연결 실패';return;
   }
-  const table=(team,rows)=>`<div class="teaminj"><h3>${esc(names(team)[0])}<span class="playereng">${esc(names(team)[1])}</span></h3><div class="inner">${rows.length?`<table class="injurytable"><thead><tr><th>선수 / Player</th><th>상태</th><th>부상 부위 / 세부 정보</th></tr></thead><tbody>${rows.map(x=>{const st=injuryStatusText(x.status);return `<tr><td><b>${esc(x.name)}</b><span class="playereng">${esc(x.name)}</span></td><td class="${st[1]}">${esc(st[0])}</td><td>${esc(x.detail||'세부 정보 미제공')}</td></tr>`}).join('')}</tbody></table>`:'<div class="empty">확인된 항목 없음<br><span class="minor">정보 미제공일 수 있어 부상자가 없다고 단정할 수 없습니다.</span></div>'}</div></div>`;
-  $('injuries').innerHTML=`<div class="injurycols">${table(m.home,homeRows)}${table(m.away,awayRows)}</div><div class="minor" style="padding:10px 2px">선수 이름은 실제 피드 원문을 사용합니다. 상태와 부상 부위는 제공처가 반환한 경우에만 표시됩니다.</div>`;
-  $('injuryStamp').textContent='공개 피드 조회 완료';
- }catch(e){$('injuries').innerHTML=`<div class="empty">부상자 데이터 연결 실패 (${esc(e.message)}).<br>부상자가 없다는 뜻은 아닙니다.</div>`;$('injuryStamp').textContent='조회 실패'}
+  const table=(team,list)=>`<div class="teaminj"><h3>${esc(names(team)[0])}<span class="playereng">${esc(names(team)[1])}</span></h3><div class="inner">${list.length?`<table class="injurytable"><thead><tr><th>선수 / Player</th><th>상태</th><th>부상 정보</th></tr></thead><tbody>${list.map(x=>{const st=injuryStatusText(x.status);return `<tr><td><b>${esc(x.name)}</b><span class="playereng">${esc(x.name)}</span></td><td class="${st[1]}">${esc(st[0])}</td><td>${esc(x.detail||'세부 정보 미제공')}</td></tr>`}).join('')}</tbody></table>`:'<div class="empty">확인된 항목 없음<br><span class="minor">공개 피드에 정보가 없을 수 있습니다.</span></div>'}</div></div>`;
+  $('injuries').innerHTML=`<div class="injurycols">${table(m.home,displayHome)}${table(m.away,displayAway)}</div><div class="minor" style="padding:10px 2px">초기 버전처럼 리그 전체 ESPN 부상자 피드를 우선 조회합니다. 제공처가 정보를 공개하지 않는 리그는 표시되지 않을 수 있습니다.</div>`;
+  $('injuryStamp').textContent='리그 피드 조회 완료';
+ }catch(e){
+  $('injuries').innerHTML=`<div class="empty">부상자 조회 오류: ${esc(e.message)}<br><span class="minor">부상자가 없다는 뜻은 아닙니다.</span></div>`;
+  $('injuryStamp').textContent='조회 오류';
+ }
 }
 async function chooseMatch(m){if(!m)return;selected=m;applyFilter();$('analysisStatus').textContent='최근 경기 조회 중';$('matchMeta').textContent=`${m.league} · ${fmtTime(m.date)} · ${m.status}${m.venue?' · '+m.venue:''}`;$('homeIcon').innerHTML=m.homeLogo?`<img class="detail-logo" src="${esc(m.homeLogo)}" alt="${esc(names(m.home)[0])} 로고" onerror="this.style.display='none'">`:'<span class="logo-fallback">팀</span>';$('awayIcon').innerHTML=m.awayLogo?`<img class="detail-logo" src="${esc(m.awayLogo)}" alt="${esc(names(m.away)[0])} 로고" onerror="this.style.display='none'">`:'<span class="logo-fallback">팀</span>';$('homeKo').textContent=names(m.home)[0];$('awayKo').textContent=names(m.away)[0];$('homeEn').textContent=names(m.home)[1];$('awayEn').textContent=names(m.away)[1];$('detailContent').innerHTML='<div class="empty">양 팀 최근 경기 기록을 불러오는 중…</div>';addForm('homeForm',[],m.home);addForm('awayForm',[],m.away);$('summary').innerHTML='<li><span class="dot">●</span>실제 최근 경기 데이터 조회 중</li>';injuriesFor(m);try{const [h,a]=await Promise.all([recentGames(m.home),recentGames(m.away)]);if(selected?.id!==m.id)return;const hs=stats(m.home,h),as=stats(m.away,a);addForm('homeForm',h,m.home);addForm('awayForm',a,m.away);let valid=hs.n>=2&&as.n>=2;let expectedH=(hs.for+as.against)/2,expectedA=(as.for+hs.against)/2,total=expectedH+expectedA;let diff=(hs.margin-as.margin)/(sport==='basketball'?14:sport==='baseball'?4:1.8)+(hs.w/Math.max(1,hs.n)-as.w/Math.max(1,as.n))*1.2;let prob=Math.round(Math.max(8,Math.min(92,50+diff*12+(sport==='soccer'?2:4))));let scoreText=m.hasScore?`${m.hs} : ${m.as}`:valid?`${expectedH.toFixed(1)} : ${expectedA.toFixed(1)}`:'표본 부족';$('detailContent').innerHTML=`
 <div class="statsgrid"><div class="statcard"><span>${esc(names(m.home)[0])} 승리 추정</span><b class="green">${valid?prob+'%':'—'}</b><div class="bar"><i style="width:${valid?prob:50}%"></i></div></div><div class="statcard"><span>${esc(names(m.away)[0])} 승리 추정</span><b class="blue">${valid?(100-prob)+'%':'—'}</b><div class="bar away"><i style="width:${valid?100-prob:50}%"></i></div></div></div>
