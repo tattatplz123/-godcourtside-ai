@@ -194,7 +194,54 @@ const playerKoNames={
 'ryan helsley':'라이언 헬슬리','ryan mountcastle':'라이언 마운트캐슬','reed trimble':'리드 트림블',
 'colin selby':'콜린 셀비','keegan akin':'키건 에이킨','cameron foster':'캐머런 포스터'
 };
-function playerKo(n){return playerKoNames[String(n||'').trim().toLowerCase()]||n}
+function playerKo(n){
+ const raw=String(n||'').trim();
+ const key=raw.toLowerCase().replace(/[.'’]/g,'').replace(/\s+/g,' ');
+ const dict={
+  'mouhamed gueye':'무하메드 게예','henri vesaar':'앙리 베사르','devin carter':'데빈 카터','tyler bilodeau':'타일러 빌로도',
+  'grant williams':'그랜트 윌리엄스','coby white':'코비 화이트','kon knueppel':'콘 크누펠','kylan boswell':'카일런 보스웰',
+  'nic claxton':'닉 클랙스턴','caleb martin':'케일럽 마틴','victor wembanyama':'빅터 웸반야마','stephen curry':'스테픈 커리',
+  'steph curry':'스테픈 커리','lebron james':'르브론 제임스','luka doncic':'루카 돈치치','kevin durant':'케빈 듀랜트',
+  'giannis antetokounmpo':'야니스 아데토쿤보','jayson tatum':'제이슨 테이텀','anthony davis':'앤서니 데이비스',
+  'ja morant':'자 모란트','joel embiid':'조엘 엠비드','nikola jokic':'니콜라 요키치','shai gilgeous-alexander':'샤이 길저스알렉산더',
+  'anthony edwards':'앤서니 에드워즈','donovan mitchell':'도노반 미첼','trae young':'트레이 영','tyrese haliburton':'타이리스 할리버튼',
+  'damian lillard':'데이미언 릴라드','james harden':'제임스 하든','kawhi leonard':'카와이 레너드','paul george':'폴 조지',
+  'jimmy butler':'지미 버틀러','bam adebayo':'뱀 아데바요','jalen brunson':'제일런 브런슨','karl-anthony towns':'칼앤서니 타운스',
+  'karl anthony towns':'칼앤서니 타운스','julius randle':'줄리어스 랜들','rudy gobert':'루디 고베어','de\'aaron fox':'디애런 팍스',
+  'domantas sabonis':'도만타스 사보니스','zion williamson':'자이언 윌리엄슨','brandon ingram':'브랜든 잉그램',
+  'cj mccollum':'CJ 맥컬럼','alperen sengun':'알페렌 셍귄','fred vanvleet':'프레드 밴블릿','jalen green':'제일런 그린',
+  'amen thompson':'아멘 톰프슨','ausar thompson':'아우사 톰프슨','cade cunningham':'케이드 커닝햄','jalen duren':'제일런 듀렌',
+  'paolo banchero':'파올로 반케로','franz wagner':'프란츠 바그너','desmond bane':'데스먼드 베인','jaren jackson jr':'자렌 잭슨 주니어',
+  'lauri markkanen':'라우리 마카넨','walker kessler':'워커 케슬러','bradley beal':'브래들리 빌','devin booker':'데빈 부커',
+  'klay thompson':'클레이 톰프슨','draymond green':'드레이먼드 그린','andrew wiggins':'앤드루 위긴스','jonathan kuminga':'조너선 쿠밍가',
+  'brandin podziemski':'브랜딘 포지엠스키','chet holmgren':'쳇 홈그렌','jalen williams':'제일런 윌리엄스',
+  'lu dort':'루 도트','jamal murray':'자말 머레이','aaron gordon':'애런 고든','michael porter jr':'마이클 포터 주니어',
+  'kyrie irving':'카이리 어빙','klay thompson':'클레이 톰프슨','khris middleton':'크리스 미들턴','brook lopez':'브룩 로페즈',
+  'myles turner':'마일스 터너','pascal siakam':'파스칼 시아캄','scottie barnes':'스코티 반스','brandon miller':'브랜든 밀러',
+  'lamelo ball':'라멜로 볼','mark williams':'마크 윌리엄스','tobias harris':'토바이어스 해리스','tyrese maxey':'타이리스 맥시',
+  'paul reed':'폴 리드','rj barrett':'RJ 배럿','immanuel quickley':'이매뉴얼 퀵클리','jakob poeltl':'야코프 퍼들',
+  'mikal bridges':'미칼 브리지스','cameron johnson':'캐머런 존슨','nic claxton':'닉 클랙스턴','ben simmons':'벤 시몬스',
+  'josh giddey':'조시 기디','nikola vucevic':'니콜라 부세비치','alex caruso':'알렉스 카루소','patrick williams':'패트릭 윌리엄스',
+  'darius garland':'다리우스 갈랜드','evan mobley':'에번 모블리','jarrett allen':'재럿 앨런','max strus':'맥스 스트러스',
+  'deandre ayton':'디안드레 에이튼','scoot henderson':'스쿳 헨더슨','jerami grant':'제라미 그랜트','shaedon sharpe':'셰이든 샤프',
+  'keegan murray':'키건 머리','kevin huerter':'케빈 허터','harrison barnes':'해리슨 반스','kevin love':'케빈 러브',
+  'terry rozier':'테리 로지어','tyler herro':'타일러 히로','duncan robinson':'던컨 로빈슨','kyle kuzma':'카일 쿠즈마',
+  'jordan poole':'조던 풀','kyle anderson':'카일 앤더슨','bobby portis':'바비 포티스','gary trent jr':'게리 트렌트 주니어',
+  'naz reid':'나즈 리드','mike conley':'마이크 콘리','jaden mcdaniels':'제이든 맥대니얼스','donte divincenzo':'돈테 디빈첸조',
+  'jonas valanciunas':'요나스 발란슈나스','bruce brown':'브루스 브라운','dillon brooks':'딜런 브룩스','marcus smart':'마커스 스마트',
+  'derrick white':'데릭 화이트','jrue holiday':'즈루 홀리데이','al horford':'알 호포드','payton pritchard':'페이튼 프리처드',
+  'jalen williams':'제일런 윌리엄스','nick richards':'닉 리처즈','cam thomas':'캠 토머스','josh hart':'조시 하트',
+  'mitchell robinson':'미첼 로빈슨','og anunoby':'OG 아누노비','precious achiuwa':'프레셔스 아치우와',
+  'victor oladipo':'빅터 올라디포','russell westbrook':'러셀 웨스트브룩','chris paul':'크리스 폴',
+  'deandre hunter':'디안드레 헌터','clint capela':'클린트 카펠라','bogdan bogdanovic':'보그단 보그다노비치',
+  'dyson daniels':'다이슨 대니얼스','onyeka okongwu':'오네카 오콩우','keldon johnson':'켈든 존슨',
+  'jeremy sochan':'제레미 소찬','devin vassell':'데빈 바셀','harrison barnes':'해리슨 반스'
+ };
+ if(dict[key])return dict[key];
+ if(typeof playerKoNames!=='undefined'&&playerKoNames[key])return playerKoNames[key];
+ // Unknown names are preserved rather than guessed incorrectly.
+ return raw;
+}
 function injuryKo(v){
  const s=String(v||'').trim();
  const d={'fracture':'골절','knee':'무릎 부상','illness':'질병','shoulder':'어깨 부상','hamstring':'햄스트링 부상','strain':'근육 염좌','surgery':'수술','soreness':'통증','inflammation':'염증','ankle':'발목 부상','foot':'발 부상','back':'허리 부상','hip':'엉덩이 부상','wrist':'손목 부상','hand':'손 부상','elbow':'팔꿈치 부상','groin':'사타구니 부상','concussion':'뇌진탕','calf':'종아리 부상','thigh':'허벅지 부상'};
